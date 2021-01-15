@@ -1,0 +1,6 @@
+*~
+.direnv
+.envrc
+README.html
+*.egg*
+__pycache__

@@ -1,0 +1,12 @@
+#+title: 🌿 herbie 🌿
+#+subtitle: A herbstluftwm interactive environment thingy.
+
+* Usage
+
+#+begin_example
+  $ herbie task dev
+#+end_example
+
+More to come (maybe).
+
+Beware, it's a mess still.
