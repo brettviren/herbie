@@ -113,5 +113,8 @@ def toscreen(tag, tree):
         index = ''.join(pathlist[1:])
         wm.add(f'rule once {match} tag={tag} index={index} maxage=10')
         wm.add(f'spawn {node.command}')
+    
+    wm.add("focus_monitor 0")
+    wm.add(f'use {tag}')
     wm.run()
 

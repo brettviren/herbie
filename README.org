@@ -7,6 +7,12 @@
   $ herbie task dev
 #+end_example
 
+Or in ~autostart~ do something like
+
+#+begin_example
+hc keybind $Mod-i spawn herbie task dev
+#+end_example
+
 More to come (maybe).
 
 Beware, it's a mess still.
