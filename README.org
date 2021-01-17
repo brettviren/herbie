@@ -1,16 +1,24 @@
 #+title: 🌿 herbie 🌿
 #+subtitle: A herbstluftwm interactive environment thingy.
 #+EXPORT_FILE_NAME: index.html
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="docs/css/email-clean-enough.css"/>
-* Install
+#+OPTIONS:   H:4 num:nil toc:2
+#+setupfile: docs/theme-readtheorg-local.setup
 
-herbie installs from source in normal Python way.
+* Intro
 
-* Usage
+~herbie~ is helper for managing a [[https://herbstluftwm.org/][herbstluftwm]] interactive environment.
 
-Current commands are as:
+** Documentation
 
-#+begin_src shell :exports both :results output code :wrap "example"
+You are reading it.  This file is it.  You can see it rendered by
+[[https://github.com/brettviren/herbie/blob/master/README.org][github]] or more beautifully by [[https://brettviren.github.io/herbie/][Emacs]] (with the help of [[https://github.com/fniessen/org-html-themes][fniessen's ReadTheOrg]])
+
+** Usage
+
+The ~herbie~ package provides a ~herbie~ command line program.  Run it to
+print a brief help message:
+
+#+begin_src shell :exports results :results output code :wrap "example"
 herbie
 #+end_src
 
@@ -23,82 +31,130 @@ Options:
 
 Commands:
   fini   Finish a task screen by closing all windows and removing the tag
+  tags   Print tags one line at a time in order
   task   Fill screen with task layout
   tasks  List known tasks
 #+end_example
 
-* herbie tasks
+The above is current as of ~herbie version~
 
-So far, herbie is focused on the idea of a "task" which for herbie
+#+begin_src shell :exports results :results output code :wrap "example"
+herbie version
+#+end_src
+
+#+RESULTS:
+#+begin_example
+0.0.0
+#+end_example
+
+The remaining sections describe more how to use ~herbie~.
+
+* Tasks
+
+So far, ~herbie~ is focused on the idea of a "task" which for ~herbie~
 means a herbstluftwm "tag" holding a certain layout which is populated
-with specific windows.  
+with specific windows.  Here is the result of a task called ~dev~.
 
 [[file:docs/ss.png][file:docs/ss-thumb.png]]
 
 ** Assure a task
 
-When one does:
+Running:
 
 #+begin_example
   $ herbie task dev
 #+end_example
 
-a tag called ~dev~ is created, layout is constructed and populated with
-windows according to the task's configuration.  This command is
-/incrementally idempotent/.  This means if the tag exists, it is reused
-and the layout is assured to match and only missing windows are
-created.  
+produces a tag called ~dev~ with a certain layout of frames populated
+with application windows based on the task configuration of the same
+name.
 
-** Key binding example
+#+begin_note
+The ~herbie task~ command is /incrementally idempotent/.  You may run it
+again and expect no change.  If you have switched to another tag,
+rerunning will merely bring you to the task tag.  
 
-The last step of a ~task~ is to move to its tag.  The ~herbie task~
-command can also be used as a screen switcher so maybe in ~autostart~
-you have something like:
-
-#+begin_example
-hc keybind $Mod-i spawn herbie task dev
-#+end_example
-
-** Handling multiple tasks with ~dmenu~
-
-But better would be to write a script like herbstluftwm's ~wselect~ to
-select which task screen layout to use or jump to.
-
-#+begin_example
-#!/bin/bash
-# herbie-tasks
-hb() { herbie "$@"; }
-dm() { ${dmenu_command:-dmenu} "$@" ;}
-dmenu_lines=${dmenu_lines:-10}
-
-id=$(hb tasks | dm -i -l $dmenu_lines -p "Task") \
-    && hb task $id
-#+end_example
-
-and then in ~autostart~ something like:
-
-#+begin_example
-hc keybind $Mod-i spawn herbie-tasks
-#+end_example
+If you have modified the layout of the task tag, rerunning will
+attempt to restore the layout and window content.  In doing so, ~herbie~
+will run an associated command if it finds an empty frame.  If a frame
+has one or more windows, regardless of what application they are from,
+~herbie~ will ignore it.  Thus if you have, say, added windows in a
+frame, do not expect a subsequent ~herbie task~ to close them.
+#+end_note
 
 ** Finishing a task
 
-A task can be "finished" by closing its windows and removing the tag.
+When ~herbie~ is asked to "finish" a task, all windows are closed and the
+tag is removed (merged to another).
+
 For example, let's do some development work and then get back to more
 important matters.
 
 #+begin_example
   $ herbie task dev
+
   ##(hack, test, commit, push)##
+
   $ herbie fini -g irc dev
+
   ##(chat, brag, lurk)##
 #+end_example
 
 ** Defining tasks
 
-Currently herbie lacks a task definition language and instead tasks
-are hard-wired in the ~herbie.tasks~ Python module.  *This will change* so
-don't get used to it.  As such, we do not discuss this further.  Move
-along, nothing to see here.
+Tasks are defined as a tree analogous to what you see from a
+~herbstclient dump~.  Each leaf describing a frame with windows has a
+command to run to provide the window and a set of X11 properties to
+match the window.
 
+#+begin_warning
+Currently ~herbie~ lacks a task definition language and instead tasks
+are hard-wired in the ~herbie.tasks~ Python module.  *This will change* so
+don't get used to it.
+#+end_warning
+
+** Tasks with ~dmenu~
+
+The ~herbie~ program can be integrated with herbstluftwm by binding keys
+to specific command lines.  To provide more interactive way to specify
+options and not take up many keybindings the provided [[file:scripts/herbie-dmenu][herbie-dmenu]]
+script gives a GUI interface.
+
+#+begin_example
+  $ herbie-dmenu task
+  $ herbie-dmenu fini
+#+end_example
+
+#+begin_note
+Note, when creating a task you may follow the task name with a
+different and new tag name.  For example you may run ~herbie-dmenu task~
+and type into ~dmenu~ like:
+
+#+begin_example
+dev dev2 <Enter>
+#+end_example
+
+This will produce the ~dev~ task not on tag ~dev~ but on tag ~dev2~.
+
+For ~fini~ command, a second argument will be interpreted as a tag to go
+to after the first tag is cleaned up.  Here, take note that ~dmenu~ will
+perform some filtering because the second tag is also in the list of
+choices.  Use ~Shift-Enter~ to defeat this.  Eg, with ~herbie-task fini~
+type into ~dmenu~ like:
+
+#+begin_example
+dev2 dev <Shift-Enter>
+#+end_example
+#+end_note
+
+
+** Calling from herbstluftwm
+
+In your ~autostart~ you may have some keybindings to run ~herbie-dmenu~
+like:
+
+#+begin_example
+hc keybind $Mod-i spawn herbie-dmenu task 
+hc keybind $Mod-Shift-i spawn herbie-dmenu fini
+#+end_example
 

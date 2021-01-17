@@ -84,7 +84,14 @@ def render_split(tree):
     return f'(split {split}:{ratio}:0{children})'
 
 
-
+def current_tags(order="index"):
+    '''
+    Return list of tags in given order
+    '''
+    wm = WM()
+    tis = sorted(wm.taginfos, key=lambda o: getattr(o, order))
+    return [ti.name for ti in tis]
+    
 
 def closescreen(tag, goto=None):
     '''
@@ -103,17 +110,19 @@ def closescreen(tag, goto=None):
         break
 
     text = wm(f'dump {tag}')
-    print ('dump:',text)
+    #print ('dump:',text)
     have = make_tree(text)
     for node in [have] + list(have.descendants):
         wids = getattr(node, "wids", ())
         for wid in wids:
             wm.add(f'close {wid}')
-    if goto:
-        wm.add("focus_monitor 0")
-        wm.add(f'use {goto}')
+    if not goto:
+        goto = mergeto
+    wm.add("focus_monitor 0")
+    wm.add(f'use {goto}')
     if mergeto:
         wm.add(f'merge_tag {tag} {mergeto}')
+    print(wm._chain)
     wm.run()
 
 def toscreen(tag, tree):
@@ -123,7 +132,7 @@ def toscreen(tag, tree):
     if tag is None:
         tag = task
 
-    print("Tree:",tree)
+    #print("Tree:",tree)
     wm = WM()
     
     try:
@@ -133,11 +142,11 @@ def toscreen(tag, tree):
 
     layout = render_split(tree)
     if layout:
-        print("Layout:",layout)
+        #print("Layout:",layout)
         wm(f'load {tag} "{layout}"')
 
     text = wm(f'dump {tag}')
-    print ('dump:',text)
+    #print ('dump:',text)
     have = make_tree(text)
 
     # walk tree and have, building as needed

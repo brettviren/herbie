@@ -1,10 +1,9 @@
 import setuptools
 
-# ver_globals = {}
-# with open("herbie/version.py") as fp:
-#     exec(fp.read(), ver_globals)
-# version = ver_globals["version"]
-version = '0.0.0'
+ver_globals = {}
+with open("herbie/version.py") as fp:
+    exec(fp.read(), ver_globals)
+version = ver_globals["version"]
 
 setuptools.setup(
     name="herbie",

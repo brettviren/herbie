@@ -3,12 +3,29 @@
 to herbstluftwm.  Until then, there is this.
 '''
 
-from herbie.util import toscreen, closescreen
+from herbie.util import toscreen, closescreen, current_tags
 
 import click
 @click.group()
 def cli():
     pass
+
+@cli.command()
+def version():
+    'Print the version'
+    import herbie
+    click.echo(herbie.__version__)
+
+@cli.command("tags")
+@click.option("-o","--order", default="index",
+              type=click.Choice(["index","name"]),
+              help="Set ordering")
+def tags(order):
+    '''
+    Print tags one line at a time in order
+    '''
+    tags = current_tags(order)
+    click.echo('\n'.join(tags))
 
 @cli.command("task")
 @click.option("-t", "--tag", type=str, default=None,

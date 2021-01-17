@@ -1,0 +1,43 @@
+#!/bin/bash
+set -x
+
+hc() { ${herbstclient_command:-herbstclient} "$@" ;}
+hb() { ${herbie_command:-herbie} "$@" ;}
+dm() { ${dmenu_command:-dmenu} "$@" ;}
+dmenu_lines=${dmenu_lines:-10}
+
+case "$1" in
+    
+    fini)
+        # build list of tags
+        title="Finalize:"
+        choices="$(hb tags)"
+        action() {
+            echo "herbie-dmenu fini '$1' '$2' all:$@"
+            if [ -n "$2" ] ; then
+                hb fini -g "$2" "$1"
+            else
+                hb fini "$1"
+            fi
+        }
+        ;;
+
+    task|*)
+        # build list of known tasks
+        title="Task:"
+        choices="$(hb tasks)"
+        action() {
+            echo "herbie-dmenu task '$1' '$2' all:$@"
+            if [ -n "$2" ] ; then
+                hb task -t "$2" "$1"
+            else
+                hb task "$1"
+            fi
+        }
+        ;;
+
+esac
+
+
+id=$(echo "$choices" | dm -i -l $dmenu_lines -p "$title") \
+    && action $id

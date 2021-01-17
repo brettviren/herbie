@@ -31,7 +31,7 @@ class WM:
 
     def call(self, cmd):
         args = self._parse_command(cmd)
-        print(args)
+        #print(args)
         proc = subprocess.run(
             [self._hc, '-n'] + args,
             stdout=subprocess.PIPE,
@@ -58,10 +58,10 @@ class WM:
         '''
         chain = ["chain", self._delim] + self._chain
         proc = self.call(chain)
-        print(proc.stdout)
-        print(proc.stderr)
+        #print(proc.stdout)
+        #print(proc.stderr)
         if proc.returncode:
-            raise RuntimeError(f'{self._hc} {cmdstr} failed:\n{proc.stderr}')
+            raise RuntimeError(f'{self._hc} {self._chain} failed:\n{proc.stderr}')
 
     def taginfo(self, name_or_index=None):
         if type(name_or_index) not in (str, int):
