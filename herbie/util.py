@@ -25,6 +25,14 @@ def tree_from_sexp(sexp, parent=None):
             if parts:
                 node.selection=int(parts.pop(0))
             continue
+
+        if val.startswith("grid:"):
+            parts = val.split(":")
+            node.orient = parts.pop(0)
+            # fixme:
+            node.grid = int(parts.pop(0))            
+            continue
+
         if val.startswith("0x"):
             wids = getattr(node, "wids", list())
             wids.append(val)
@@ -78,25 +86,63 @@ def render_split(tree):
 
 
 
+def closescreen(tag, goto=None):
+    '''
+    Close all windows in tag and then merge the tag away.
+
+    If goto given, make it the current tag.
+    '''
+    wm = WM()
+
+    ti = wm.taginfo(tag)
+    mergeto = None
+    for other in wm.taginfos:
+        if other.name == tag:
+            continue
+        mergeto = other.name
+        break
+
+    text = wm(f'dump {tag}')
+    print ('dump:',text)
+    have = make_tree(text)
+    for node in [have] + list(have.descendants):
+        wids = getattr(node, "wids", ())
+        for wid in wids:
+            wm.add(f'close {wid}')
+    if mergeto:
+        wm.add(f'merge_tag {tag} {mergeto}')
+    if goto:
+        wm.add("focus_monitor 0")
+        wm.add(f'use {goto}')
+    wm.run()
+
 def toscreen(tag, tree):
     '''
     Put tree to tag, idempotently
     '''
+    if tag is None:
+        tag = task
+
+    print("Tree:",tree)
     wm = WM()
-    if tag not in wm.tags:
+    
+    try:
+        wm.taginfo(tag)
+    except KeyError:
         wm(f'add {tag}')
 
     layout = render_split(tree)
-    print(layout)
-    wm(f'load {tag} "{layout}"')
+    if layout:
+        print("Layout:",layout)
+        wm(f'load {tag} "{layout}"')
 
     text = wm(f'dump {tag}')
-    print (text)
+    print ('dump:',text)
     have = make_tree(text)
 
     # walk tree and have, building as needed
     r = Resolver()
-    for node in tree.descendants:
+    for node in [tree] + list(tree.descendants):
         if not hasattr(node, 'command'):
             continue
         pathlist = [str(n.name) for n in node.path]

@@ -1,5 +1,8 @@
 import shlex
 import subprocess
+from collections import namedtuple
+
+TagInfo = namedtuple("TagInfo","name index status")
 
 class WM:
     'Make a call on herbstluftwm'
@@ -60,13 +63,29 @@ class WM:
         if proc.returncode:
             raise RuntimeError(f'{self._hc} {cmdstr} failed:\n{proc.stderr}')
 
+    def taginfo(self, name_or_index=None):
+        if type(name_or_index) not in (str, int):
+            raise ValueError('taginfo requires a tag name or index')
+        if isinstance(name_or_index, int):
+            return self.taginfos[name_or_index]
+        for ti in self.taginfos:
+            if ti.name == name_or_index:
+                return ti
+        raise KeyError(f'no such tag: {name_or_index}')
+
     @property
-    def tags(self):
+    def taginfos(self):
         '''
         Return ordered array of tags
         '''
-        text = self("foreach T tags.by-name. sprintf S '%c.name' T chain , get_attr S , echo")
-        return text.split('\n')
+        text = self("tag_status")
+        parts = text.strip().split('\t')
 
-
+        tis = list()
+        for index,part in enumerate(parts):
+            status = part[0]
+            name = part[1:]
+            ti = TagInfo(name, index, status)
+            tis.append(ti)
+        return tis
 

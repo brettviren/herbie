@@ -1,18 +1,104 @@
 #+title: 🌿 herbie 🌿
 #+subtitle: A herbstluftwm interactive environment thingy.
+#+EXPORT_FILE_NAME: index.html
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="docs/css/email-clean-enough.css"/>
+* Install
+
+herbie installs from source in normal Python way.
 
 * Usage
+
+Current commands are as:
+
+#+begin_src shell :exports both :results output code :wrap "example"
+herbie
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Usage: herbie [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  fini   Finish a task screen by closing all windows and removing the tag
+  task   Fill screen with task layout
+  tasks  List known tasks
+#+end_example
+
+* herbie tasks
+
+So far, herbie is focused on the idea of a "task" which for herbie
+means a herbstluftwm "tag" holding a certain layout which is populated
+with specific windows.  
+
+[[file:docs/ss.png][file:docs/ss-thumb.png]]
+
+** Assure a task
+
+When one does:
 
 #+begin_example
   $ herbie task dev
 #+end_example
 
-Or in ~autostart~ do something like
+a tag called ~dev~ is created, layout is constructed and populated with
+windows according to the task's configuration.  This command is
+/incrementally idempotent/.  This means if the tag exists, it is reused
+and the layout is assured to match and only missing windows are
+created.  
+
+** Key binding example
+
+The last step of a ~task~ is to move to its tag.  The ~herbie task~
+command can also be used as a screen switcher so maybe in ~autostart~
+you have something like:
 
 #+begin_example
 hc keybind $Mod-i spawn herbie task dev
 #+end_example
 
-More to come (maybe).
+** Handling multiple tasks with ~dmenu~
 
-Beware, it's a mess still.
+But better would be to write a script like herbstluftwm's ~wselect~ to
+select which task screen layout to use or jump to.
+
+#+begin_example
+#!/bin/bash
+# herbie-tasks
+hb() { herbie "$@"; }
+dm() { ${dmenu_command:-dmenu} "$@" ;}
+dmenu_lines=${dmenu_lines:-10}
+
+id=$(hb tasks | dm -i -l $dmenu_lines -p "Task") \
+    && hb task $id
+#+end_example
+
+and then in ~autostart~ something like:
+
+#+begin_example
+hc keybind $Mod-i spawn herbie-tasks
+#+end_example
+
+** Finishing a task
+
+A task can be "finished" by closing its windows and removing the tag.
+For example, let's do some development work and then get back to more
+important matters.
+
+#+begin_example
+  $ herbie task dev
+  ##(hack, test, commit, push)##
+  $ herbie fini -g irc dev
+  ##(chat, brag, lurk)##
+#+end_example
+
+** Defining tasks
+
+Currently herbie lacks a task definition language and instead tasks
+are hard-wired in the ~herbie.tasks~ Python module.  *This will change* so
+don't get used to it.  As such, we do not discuss this further.  Move
+along, nothing to see here.
+
+

@@ -1,4 +1,4 @@
-from anytree import Node, RenderTree
+from herbie.util import binode, render_split
 
 def _test_commands():
     '''
@@ -27,9 +27,15 @@ def test_node():
     ur = binode(u, command="firefox-esr -P default-esr",
               match=dict(title='Mozilla Firefox'))
     d = binode(top, command="kitty", match={'class':'kitty'})
-    print (RenderTree(top))
     print(render_split(top))
     return top
+
+
+def test_task_irc():
+    from herbie.tasks import task_irc
+    tree = task_irc()
+    print('IRC',render_split(tree))
+    
 
 def test_toscreen():
     top = test_node()
@@ -39,7 +45,6 @@ def test_sexp():
     # eg from hc dump
     text = '(split vertical:0.75:0 (split horizontal:0.5:0 (clients vertical:1 0x1e00142 0x3200142) (clients vertical:1 0x1200003 0x1200024)) (clients vertical:1 0x1c0000e 0x300000e))'
     top = make_tree(text)
-    print (RenderTree(top))
     print(render_split(top))
 
 
