@@ -109,11 +109,11 @@ def closescreen(tag, goto=None):
         wids = getattr(node, "wids", ())
         for wid in wids:
             wm.add(f'close {wid}')
-    if mergeto:
-        wm.add(f'merge_tag {tag} {mergeto}')
     if goto:
         wm.add("focus_monitor 0")
         wm.add(f'use {goto}')
+    if mergeto:
+        wm.add(f'merge_tag {tag} {mergeto}')
     wm.run()
 
 def toscreen(tag, tree):
