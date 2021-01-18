@@ -7,14 +7,22 @@ from herbie.util import toscreen, closescreen, current_tags
 
 import click
 @click.group()
-def cli():
-    pass
+@click.option("-u","--ui",
+              default="term",
+              type=click.Choice(["term","dmenu","gui"]), 
+              help="Set user interface")
+@click.pass_context
+def cli(ctx, ui):
+    import importlib
+    uimod = importlib.import_module("herbie."+ui)
+    ctx.obj["ui"] = uimod
 
 @cli.command()
-def version():
+@click.pass_context
+def version(ctx):
     'Print the version'
     import herbie
-    click.echo(herbie.__version__)
+    ctx.obj["ui"].echo(herbie.__version__)
 
 @cli.command("tags")
 @click.option("-o","--order", default="index",
@@ -45,15 +53,18 @@ def task(tag, task):
     pass
 
 @cli.command("tasks")
-def tasks():
+@click.pass_context
+def tasks(ctx):
     '''
     List known tasks
     '''
     # fixme: move to some real config system
     import herbie.tasks
+    lines = list()
     for one in dir(herbie.tasks):
         if one.startswith("task_"):
-            click.echo(one.split('_',1)[1])
+            lines.append(one.split('_',1)[1])
+    ctx.obj['ui'].echo(lines)
 
 @cli.command("fini")
 @click.option("-g", "--goto", type=str, default=None,
@@ -68,7 +79,7 @@ def fini(goto, name):
 
 
 def main():
-    cli(obj=None)
+    cli(obj={})
 
 
 if '__main__' == __name__:

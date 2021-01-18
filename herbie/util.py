@@ -4,6 +4,14 @@ from anytree.resolver import Resolver, ChildResolverError
 
 from herbie.stluft import WM
 
+def stringify(something, ending=None):
+    if not isinstance(something, str):
+        # fixme: assume sequence, but better test for this type directly
+        something = '\n'.join(something)
+    if ending is not None:
+        something += something
+    return something
+
 def tree_from_sexp(sexp, parent=None):
     '''
     Interpret sexp as from "hc dump" and turn into node tree.
