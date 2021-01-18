@@ -4,12 +4,31 @@ from anytree.resolver import Resolver, ChildResolverError
 
 from herbie.stluft import WM
 
+def available_tasks():
+    '''
+    Return list of available tasks.
+    '''
+    import herbie.tasks
+    lines = list()
+    for one in dir(herbie.tasks):
+        if one.startswith("task_"):
+            lines.append(one.split('_',1)[1])
+    return lines
+
+def get_task(task):
+    '''
+    Return named task tree.
+    '''
+    import herbie.tasks
+    meth = getattr(herbie.tasks, 'task_'+task)
+    return meth()
+
 def stringify(something, ending=None):
     if not isinstance(something, str):
         # fixme: assume sequence, but better test for this type directly
         something = '\n'.join(something)
     if ending is not None:
-        something += something
+        something += ending
     return something
 
 def tree_from_sexp(sexp, parent=None):
@@ -130,7 +149,7 @@ def closescreen(tag, goto=None):
     wm.add(f'use {goto}')
     if mergeto:
         wm.add(f'merge_tag {tag} {mergeto}')
-    print(wm._chain)
+    #print(wm._chain)
     wm.run()
 
 def toscreen(tag, tree):

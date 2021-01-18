@@ -25,4 +25,4 @@ def echo(text, title=None):
     dmenu(stringify(text), title)
     
 def choose(choices, prompt):
-    return dmenu(choices, prompt)
+    return dmenu(stringify(choices), prompt)

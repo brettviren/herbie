@@ -113,40 +113,65 @@ are hard-wired in the ~herbie.tasks~ Python module.  *This will change* so
 don't get used to it.
 #+end_warning
 
-** Tasks with ~dmenu~
+** Interactivity
 
-The ~herbie~ program can be integrated with herbstluftwm by binding keys
-to specific command lines.  To provide more interactive way to specify
-options and not take up many keybindings the provided [[file:scripts/herbie-dmenu][herbie-dmenu]]
-script gives a GUI interface.
+~herbie~ is user-interactive.  The default UI is the terminal and a
+number of others are supported.  To activate them, add the global
+command line argument ~-u~ like in:
 
 #+begin_example
-  $ herbie-dmenu task
-  $ herbie-dmenu fini
+  $ herbie -u gui tasks
+#+end_example
+
+Some ~herbie~ commands which take arguments have fully user-interactive
+versions of the same name but with the prefix "~i~".  For example:
+
+#+begin_example
+  $ herbie -u gui itask
+  $ herbie -u gui ifini
 #+end_example
 
 #+begin_note
-Note, when creating a task you may follow the task name with a
-different and new tag name.  For example you may run ~herbie-dmenu task~
-and type into ~dmenu~ like:
+These are useful to bind to keys as described below.
+#+end_note
+
+Both ~itask~ and ~ifini~ prompt the user for a task or tag and both
+accepts an optional second tag in the response.  See their
+documentation for how this optional second tag is interpreted.
+
+#+begin_note
+When ~herbie~ uses ~dmenu~ to prompt the user a ~<Shift>+<Enter>~ may be
+required for the response to not be subject to filtering.  This is the
+case if the second optional tag is itself in the list of choices.
+#+end_note
+
+As an example, assume we already have a tag named ~dev~ and want to make
+a new tag using the ~dev~ task.  This is done using the ~herbie itask~
+command (default UI uses the terminal) like:
 
 #+begin_example
-dev dev2 <Enter>
+  $ herbie itask
+  bweb
+  dev
+  dweb
+  irc
+  rss
+
+  Task: dev dev2
 #+end_example
 
 This will produce the ~dev~ task not on tag ~dev~ but on tag ~dev2~.
-
-For ~fini~ command, a second argument will be interpreted as a tag to go
-to after the first tag is cleaned up.  Here, take note that ~dmenu~ will
-perform some filtering because the second tag is also in the list of
-choices.  Use ~Shift-Enter~ to defeat this.  Eg, with ~herbie-task fini~
-type into ~dmenu~ like:
+Sometime later we may remove this ~dev2~ tag with ~ifini~.  In this
+example we use the ~gui~ UI:
 
 #+begin_example
-dev2 dev <Shift-Enter>
+  $ herbie -u gui ifini
+  (dmenu) Tag to finish: dev2 dev <Shift>+<Enter>
 #+end_example
-#+end_note
 
+This closes out ~dev2~ and leaves us in the previously existing tag
+called ~dev~.  If not final tag is given then the first tag which is not
+the one to be finalize provides our landing spot.
 
 ** Calling from herbstluftwm
 
@@ -154,7 +179,7 @@ In your ~autostart~ you may have some keybindings to run ~herbie-dmenu~
 like:
 
 #+begin_example
-hc keybind $Mod-i spawn herbie-dmenu task 
-hc keybind $Mod-Shift-i spawn herbie-dmenu fini
+hc keybind $Mod-i spawn herbie -u gui itask 
+hc keybind $Mod-Shift-i spawn herbie -u gui ifini
 #+end_example
 

@@ -10,7 +10,7 @@ def echo(text, title=None):
     sys.stderr.write(stringify(text, '\n'))
 
 def choose(choices, prompt):
-    echo(choices)
+    echo(stringify(choices, '\n'))
     return input(prompt)
 
     

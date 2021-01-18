@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# This provides a user-interactive interface to herbie commands with
+# options.  Note, its functionality has been subsumed into herbie's
+# "i" commands (eg "task" -> "itask", "fini" -> "ifini").
+
 set -x
 
 hc() { ${herbstclient_command:-herbstclient} "$@" ;}
