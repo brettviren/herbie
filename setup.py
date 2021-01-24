@@ -18,6 +18,8 @@ setuptools.setup(
         "click",
         "sexpdata",
         "anytree",
+        "vext",
+        "vext.gi",
     ],
     entry_points = dict(
         console_scripts = [
