@@ -1,17 +1,17 @@
 import sexpdata
 from anytree import Node
 from anytree.resolver import Resolver, ChildResolverError
+from importlib import import_module
 
-from herbie.stluft import WM
 
-def available_tasks():
+def available(thing="task"):
     '''
-    Return list of available tasks.
+    Return list of things available from a thing.
     '''
-    import herbie.tasks
+    mod = import_module(f'herbie.{thing}s')
     lines = list()
-    for one in dir(herbie.tasks):
-        if one.startswith("task_"):
+    for one in dir(mod):
+        if one.startswith(thing + "_"):
             lines.append(one.split('_',1)[1])
     return lines
 
@@ -60,11 +60,15 @@ def tree_from_sexp(sexp, parent=None):
             node.grid = int(parts.pop(0))            
             continue
 
+        if val.startswith("max:"):
+            continue
+
         if val.startswith("0x"):
             wids = getattr(node, "wids", list())
             wids.append(val)
             node.wids = wids
             continue
+
         raise ValueError(f'Unknown: {term}')
     return node
 
@@ -111,23 +115,13 @@ def render_split(tree):
     return f'(split {split}:{ratio}:0{children})'
 
 
-def current_tags(order="index"):
-    '''
-    Return list of tags in given order
-    '''
-    wm = WM()
-    tis = sorted(wm.taginfos, key=lambda o: getattr(o, order))
-    return [ti.name for ti in tis]
-    
 
-def closescreen(tag, goto=None):
+def closescreen(wm, tag, goto=None):
     '''
     Close all windows in tag and then merge the tag away.
 
     If goto given, make it the current tag.
     '''
-    wm = WM()
-
     ti = wm.taginfo(tag)
     mergeto = None
     for other in wm.taginfos:
@@ -152,7 +146,7 @@ def closescreen(tag, goto=None):
     #print(wm._chain)
     wm.run()
 
-def toscreen(tag, tree):
+def toscreen(wm, tag, tree):
     '''
     Put tree to tag, idempotently
     '''
@@ -160,7 +154,6 @@ def toscreen(tag, tree):
         tag = task
 
     #print("Tree:",tree)
-    wm = WM()
     
     try:
         wm.taginfo(tag)
@@ -199,4 +192,21 @@ def toscreen(tag, tree):
     wm.add("focus_monitor 0")
     wm.add(f'use {tag}')
     wm.run()
+
+
+# def switch_windows(wm):
+#     '''Switch windows.
+
+#     '''
+#     wm("new_attr string tags.focus.my_switch_order")
+#     wm("new_attr string tags.focus.my_switch_time")
+
+#     was = wm("attr tags.focus.my_switch_order").split()
+#     now = wm.wids()
+#     was = [w for w in was if w in now] # keep old if we have
+#     now = [w for w in now if w not in was] # find new
+#     wids = now + was
+#     cur = wm("attr clients.focus.winid")
+#     icur = wids.index(cur)
+
 

@@ -27,13 +27,20 @@ herbie
 Usage: herbie [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --help  Show this message and exit.
+  -h, --hc TEXT              Set the herbstclient executable name
+  -u, --ui [term|dmenu|gui]  Set user interface
+  --help                     Show this message and exit.
 
 Commands:
-  fini   Finish a task screen by closing all windows and removing the tag
-  tags   Print tags one line at a time in order
-  task   Fill screen with task layout
-  tasks  List known tasks
+  fini     Finish a task screen by closing all windows and removing the tag
+  ifini    Interactively finish a task screen by closing all windows and...
+  itask    Interactively figure how to fill screen with task layout
+  loop     Run a looper
+  loops    List known loopers
+  tags     Print tags one line at a time in order
+  task     Fill screen with task layout
+  tasks    List known tasks
+  version  Print the version
 #+end_example
 
 The above is current as of ~herbie version~
@@ -47,7 +54,23 @@ herbie version
 0.0.0
 #+end_example
 
-The remaining sections describe more how to use ~herbie~.
+
+
+As long as this version is held at ~0.0.0~ expect breaking changes.
+
+** Concepts
+
+~herbie~ functionality is organized into these concepts:
+
+- tasks :: these are things you do, not herbie.  herbie will help you
+  do your tasks by making it easy to set up and tear a task-specific
+  tag.
+
+- loops :: herbie can provide for ongoing behavior by issuing commands
+  in response to herbstluftwm events aka hooks.
+
+The remaining sections describe each concept and how to use its
+features.
 
 * Tasks
 
@@ -183,3 +206,42 @@ hc keybind $Mod-i spawn herbie -u gui itask
 hc keybind $Mod-Shift-i spawn herbie -u gui ifini
 #+end_example
 
+
+
+* Loops
+
+A herbie loop is a long-running function that responds to the events
+emitted by herbstluftwm.  Like "tasks" describe above one runs a loop
+by naming it.  
+
+** Available loops
+
+The available loops are printed with:
+
+#+begin_src shell :exports both :results output code :wrap "example"
+herbie loops
+#+end_src
+
+#+RESULTS:
+#+begin_example
+dump
+stamp
+stamp_switch
+switch
+#+end_example
+
+- dump :: like ~herbstclient --idle~
+- stamp :: add a ~my_focus_time~ to each client holding a time stamp of last focus
+- switch :: attempt "Sawfish-like" window switching, it requires *stamp*.
+
+** Running loops
+
+A herbie loop may be run on the command line and will exit when a
+~reload~ hook event is received from herbstlufwm.  To run herbie loops
+add them at the end of your ~autostart~ file such as below where
+~panel.sh~ is started.
+
+#+begin_example
+herbie loop stamp &
+herbie loop switch &
+#+end_example

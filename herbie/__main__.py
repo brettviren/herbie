@@ -2,20 +2,26 @@
 '''Someday a true rain will come and wash out a real Python interface
 to herbstluftwm.  Until then, there is this.
 '''
+from herbie.stluft import WM
 
-from herbie.util import toscreen, closescreen, current_tags, available_tasks, get_task
+from herbie.util import (
+    toscreen, closescreen, 
+    available, get_task)
 
 import click
 @click.group()
+@click.option("-h","--hc",default="herbstclient",
+              help="Set the herbstclient executable name")
 @click.option("-u","--ui",
               default="term",
               type=click.Choice(["term","dmenu","gui"]), 
               help="Set user interface")
 @click.pass_context
-def cli(ctx, ui):
+def cli(ctx, hc, ui):
     import importlib
     uimod = importlib.import_module("herbie."+ui)
     ctx.obj["ui"] = uimod
+    ctx.obj["wm"] = WM(hc)
 
 @cli.command()
 @click.pass_context
@@ -33,7 +39,7 @@ def tags(ctx, order):
     '''
     Print tags one line at a time in order
     '''
-    tags = current_tags(order)
+    tags = ctx.obj['wm'].current_tags(order)
     ctx.obj['ui'].echo('\n'.join(tags))
 
 @cli.command("task")
@@ -58,7 +64,8 @@ def itask(ctx):
     '''
     Interactively figure how to fill screen with task layout
     '''
-    tasks = available_tasks()
+    wm = ctx.obj['wm']
+    tasks = available("task")
     got = ctx.obj['ui'].choose(tasks, "Task: ")
     if not got:
         return
@@ -68,7 +75,7 @@ def itask(ctx):
         tag = got[1]
         
     tree = get_task(task)
-    toscreen(tag, tree)
+    toscreen(wm, tag, tree)
 
 
 
@@ -79,7 +86,7 @@ def tasks(ctx):
     List known tasks
     '''
     # fixme: move to some real config system
-    ctx.obj['ui'].echo(available_tasks())
+    ctx.obj['ui'].echo(available("task"))
 
 @cli.command("fini")
 @click.option("-g", "--goto", type=str, default=None,
@@ -97,7 +104,8 @@ def ifini(ctx):
     '''
     Interactively finish a task screen by closing all windows and removing the tag
     '''
-    tags = current_tags()
+    wm = ctx.obj['wm']
+    tags = wm.current_tags()
     got = ctx.obj['ui'].choose(tags, "Tag to finish: ")
     if not got:
         return
@@ -106,7 +114,39 @@ def ifini(ctx):
     goto = None
     if len(got) > 1:
         goto = got[1]
-    closescreen(name, goto)
+    closescreen(wm, name, goto)
+
+
+@cli.command("loop")
+@click.argument("looper")
+@click.pass_context
+def loop(ctx, looper):
+    '''
+    Run a looper
+    '''
+    wm = ctx.obj['wm']
+    import herbie.loops
+    meth = getattr(herbie.loops, 'loop_'+looper)
+    meth(wm)
+    
+@cli.command("loops")
+@click.pass_context
+def loops(ctx):
+    '''
+    List known loopers
+    '''
+    ctx.obj['ui'].echo(available("loop"))
+
+    
+
+# @cli.command("switch")
+# @click.pass_context
+# def switch(ctx):
+#     '''
+#     Switch windows.
+#     '''
+#     wm = ctx.obj['wm']
+#     switch_windows(wm)
 
 
 

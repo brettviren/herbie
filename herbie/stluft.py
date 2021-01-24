@@ -2,6 +2,8 @@ import shlex
 import subprocess
 from collections import namedtuple
 
+from herbie.util import make_tree
+
 TagInfo = namedtuple("TagInfo","name index status")
 
 class WM:
@@ -63,7 +65,18 @@ class WM:
         if proc.returncode:
             raise RuntimeError(f'{self._hc} {self._chain} failed:\n{proc.stderr}')
 
+    def attr(self, what):
+        text = self("attr " + what)
+        if what.endswith("."):
+            return text
+        return parse_attrs(text)
+
     def taginfo(self, name_or_index=None):
+        '''
+        Return tag info for tag given by name or index or current.
+        '''
+        if name_or_index is None:
+            name_or_index = self.attr("tags.focus.name")
         if type(name_or_index) not in (str, int):
             raise ValueError('taginfo requires a tag name or index')
         if isinstance(name_or_index, int):
@@ -88,4 +101,53 @@ class WM:
             ti = TagInfo(name, index, status)
             tis.append(ti)
         return tis
+
+    @property
+    def focused_tag(self):
+        return self("attr tags.focus.name")
+
+    def current_tags(self, order="index"):
+        '''
+        Return list of tags in given order
+        '''
+        tis = sorted(self.taginfos, key=lambda o: getattr(o, order))
+        return [ti.name for ti in tis]
+    
+
+    def wids(self, tag=None):
+        '''
+        Return window IDs on tag or focused tag
+        '''
+        if tag:
+            dump = self(f'dump {tag}')
+        else:
+            dump = self('substitute T tags.focus.name dump T')
+        tree = make_tree(dump)
+        nodes = [tree] + list(tree.descendants)
+        wids = [x.wids for x in nodes if hasattr(x, 'wids')]
+        return [w for ww in wids for w in ww]
+    
+    def events(self, *wants):
+        '''
+        Return generator of herbstluftwm hook events.
+
+        Pass wants, a list of specific events.
+        '''
+        #proc = self.call(['--idle'] + list(wants))
+        proc = subprocess.Popen(
+            [self._hc, '--idle'] + list(wants),
+            stdout=subprocess.PIPE,
+            #stderr=subprocess.PIPE,
+            env=self.env,
+            #bufsize=1,
+            universal_newlines=True,
+        )
+        print("reading idle")
+        for line in iter(proc.stdout.readline, ""):
+            if line == "":
+                return
+            yield line.strip()
+        # for n in proc.stdout.readlines():
+        #     print(n)
+        #return iter(proc.stdout.readline,'')
 
