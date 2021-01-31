@@ -1,7 +1,65 @@
+import time
 import sexpdata
 from anytree import Node
 from anytree.resolver import Resolver, ChildResolverError
 from importlib import import_module
+
+
+def select_window(wm, ui, tags = None, ignore_focus=True,
+                  pattern = '{winid} {tag}/{title} ({dt}s)'):
+    '''Use UI to select a window.
+
+    Candidates offered depend on tags and ignore_focus.
+
+    tags of None means current focused, "all" means all tags, "other"
+    means all but current or tags may be a list of tag names.
+
+    The pattern is used to form the line used in the UI.choose().
+
+    '''
+    if tags is None:
+        tags = [wm.focused_tag]
+    elif isinstance(tags, str):
+        if tags == "all":
+            tags = wm.current_tags()
+        if tags == "other":
+            tags = wm.current_tags()
+            tags.remove(wm.focused_tag)
+    # else it is assumed to be a list
+
+    wid_focus = None
+    if ignore_focus:
+        wid_focus = wm("attr clients.focus.winid")
+
+    winfos = dict()
+    for tag in tags:
+        for one in wm.winfos(tag):
+            winfos[one['winid']] = one
+
+    bytime = sorted(winfos.values(),
+                    key=lambda o: getattr(o, 'my_focus_time', 0.0))
+
+    now = time.time()
+
+    lines = list()
+    lines_invis = list()
+    for winfo in bytime:
+        if winfo['winid'] == wid_focus:
+            continue
+        dt = now - winfo['my_focus_time']
+        line = pattern.format(dt=int(dt), **winfo)
+        if winfo['visible']:
+            lines.append(line)
+        else:
+            lines_invis.append(line)
+    lines.reverse()
+    lines_invis.reverse()
+    lines += lines_invis
+    got = ui.choose(lines, 'Select window: ')
+    if not got:
+        return
+    return got.split(' ')[0]
+    
 
 
 def available(thing="task"):

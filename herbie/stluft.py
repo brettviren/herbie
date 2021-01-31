@@ -114,6 +114,54 @@ class WM:
         return [ti.name for ti in tis]
     
 
+    def winfo(self, wid = "focus"):
+        '''
+        Return dict of attributes for window of given wid or focused.
+        '''
+        lines = self(f'attr clients.{wid}').split('\n')
+        lines = lines[lines.index(' V V V')+1:]
+        ret = dict()
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            t,_,_ = line[:5].split(' ')
+            k,v = line[6:].split(" = ")
+
+            if t == "b":        # boolean
+                v = v == "true"
+            elif t == "c":      # color
+                pass
+            elif t == "i":      # integer
+                v = int(v)
+            elif t == "r":      # regex
+                pass
+            elif t == "s":      # string
+                v = v[1:-1]     # remove quotes
+                try:            # maybe a float as string
+                    v = float(v)
+                except ValueError:
+                    pass
+            elif t == "u":      # unsigned int
+                v = int(v)
+            else:
+                v = None
+                
+            if v is None:
+                continue
+            ret[k] = v
+        return ret
+            
+
+    def winfos(self, tag=None):
+        '''
+        Return list of window infos for the given tag or current tag.
+        '''
+        wids = self.wids(tag);
+        return [self.winfo(wid) for wid in wids]
+        
+
     def wids(self, tag=None):
         '''
         Return window IDs on tag or focused tag

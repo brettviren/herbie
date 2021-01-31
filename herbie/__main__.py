@@ -2,10 +2,13 @@
 '''Someday a true rain will come and wash out a real Python interface
 to herbstluftwm.  Until then, there is this.
 '''
+import herbie
+
 from herbie.stluft import WM
 
 from herbie.util import (
     toscreen, closescreen, 
+    select_window,
     available, get_task)
 
 import click
@@ -27,8 +30,28 @@ def cli(ctx, hc, ui):
 @click.pass_context
 def version(ctx):
     'Print the version'
-    import herbie
     ctx.obj["ui"].echo(herbie.__version__)
+
+@cli.command("wselect")
+@click.pass_context
+def wselect(ctx):
+    'Select and focus a window'
+
+    wm = ctx.obj['wm']
+    ui = ctx.obj['ui']
+    got = select_window(wm, ui)
+    if got:
+        wm(f'jumpto {got}')
+
+@cli.command("wbring")
+@click.pass_context
+def wbring(ctx):
+    'Bring and focus a window on current tab'
+    wm = ctx.obj['wm']
+    ui = ctx.obj['ui']
+    got = select_window(wm, ui, "other")
+    if got:
+        wm(f'bring {got}')
 
 @cli.command("tags")
 @click.option("-o","--order", default="index",
