@@ -6,7 +6,7 @@ from importlib import import_module
 
 
 def select_window(wm, ui, tags = None, ignore_focus=True,
-                  pattern = '{winid} {tag}/{title} ({dt}s)'):
+                  pattern = '{winid} [{tag}] {title} ({dt}s)'):
     '''Use UI to select a window.
 
     Candidates offered depend on tags and ignore_focus.
@@ -36,25 +36,30 @@ def select_window(wm, ui, tags = None, ignore_focus=True,
         for one in wm.winfos(tag):
             winfos[one['winid']] = one
 
-    bytime = sorted(winfos.values(),
-                    key=lambda o: getattr(o, 'my_focus_time', 0.0))
+    bytime = list(sorted(winfos.values(),
+                    key=lambda o: o['my_focus_time']))
+
+    bytime.reverse()
 
     now = time.time()
-
     lines = list()
     lines_invis = list()
+    focus_line = None
     for winfo in bytime:
-        if winfo['winid'] == wid_focus:
-            continue
         dt = now - winfo['my_focus_time']
         line = pattern.format(dt=int(dt), **winfo)
+        if winfo['winid'] == wid_focus:
+            focus_line = line
+            continue
         if winfo['visible']:
             lines.append(line)
         else:
             lines_invis.append(line)
-    lines.reverse()
-    lines_invis.reverse()
+
     lines += lines_invis
+    if focus_line:
+        lines.append(focus_line)
+    ui.lines = len(lines)
     got = ui.choose(lines, 'Select window: ')
     if not got:
         return

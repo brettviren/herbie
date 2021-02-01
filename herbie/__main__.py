@@ -16,14 +16,14 @@ import click
 @click.option("-h","--hc",default="herbstclient",
               help="Set the herbstclient executable name")
 @click.option("-u","--ui",
-              default="term",
-              type=click.Choice(["term","dmenu","gui"]), 
+              default="gui",
+              type=click.Choice(["term", "gui"]), 
               help="Set user interface")
 @click.pass_context
 def cli(ctx, hc, ui):
     import importlib
     uimod = importlib.import_module("herbie."+ui)
-    ctx.obj["ui"] = uimod
+    ctx.obj["ui"] = uimod.UI()
     ctx.obj["wm"] = WM(hc)
 
 @cli.command()
@@ -33,13 +33,25 @@ def version(ctx):
     ctx.obj["ui"].echo(herbie.__version__)
 
 @cli.command("wselect")
+@click.option("-t", "--tags", type=str, default=None,
+              help="Which tags to consider, focus=None or all or other")
 @click.pass_context
-def wselect(ctx):
+def wselect(ctx, tags):
     'Select and focus a window'
+
+    if tags is None or tags == "focus":
+        tags = None
+    elif tags in ["all","other"]:
+        tags = tags
+    else:
+        tags = tags.split(",")
 
     wm = ctx.obj['wm']
     ui = ctx.obj['ui']
-    got = select_window(wm, ui)
+    ui.monitor = "focused"
+    ui.width = -50
+
+    got = select_window(wm, ui, tags)
     if got:
         wm(f'jumpto {got}')
 
@@ -49,9 +61,40 @@ def wbring(ctx):
     'Bring and focus a window on current tab'
     wm = ctx.obj['wm']
     ui = ctx.obj['ui']
+    ui.monitor = "focused"
+    ui.width = -50
     got = select_window(wm, ui, "other")
     if got:
         wm(f'bring {got}')
+
+@cli.command("waction")
+@click.pass_context
+def waction(ctx):
+    '''
+    Select and perform an action on a window
+    '''
+    wm = ctx.obj['wm']
+    cmdlist = [
+        ("Close", "close"),
+        ("Toggle fullscreen", "fullscreen toggle"),
+        ("Toggle pseudotile", "pseudotile toggle"),
+    ]
+    for tag in wm.current_tags():
+        cmdlist.append((f'Move to tag {tag}', f'move {tag}'))
+    ui = ctx.obj['ui']
+    ui.monitor = "focused_window"
+    ui.location = 'tl'
+    ui.lines = len(cmdlist)
+    got = ui.choose([c[0] for c in cmdlist], "Window action")
+    if not got:
+        return
+    got = got.strip()
+    for arg, cmd in cmdlist:
+        if arg != got:
+            continue
+        print(cmd)
+        wm(cmd)
+        return
 
 @cli.command("tags")
 @click.option("-o","--order", default="index",
@@ -89,7 +132,11 @@ def itask(ctx):
     '''
     wm = ctx.obj['wm']
     tasks = available("task")
-    got = ctx.obj['ui'].choose(tasks, "Task: ")
+    ui = ctx.obj['ui']
+    ui.monitor = "focused"
+    ui.width = -20
+    ui.lines = len(tasks)
+    got = ui.choose(tasks, "Task")
     if not got:
         return
     got = got.split()
