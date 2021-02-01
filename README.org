@@ -27,9 +27,9 @@ herbie
 Usage: herbie [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  -h, --hc TEXT              Set the herbstclient executable name
-  -u, --ui [term|dmenu|gui]  Set user interface
-  --help                     Show this message and exit.
+  -h, --hc TEXT        Set the herbstclient executable name
+  -u, --ui [term|gui]  Set user interface
+  --help               Show this message and exit.
 
 Commands:
   fini     Finish a task screen by closing all windows and removing the tag
@@ -41,20 +41,21 @@ Commands:
   task     Fill screen with task layout
   tasks    List known tasks
   version  Print the version
+  waction  Select and perform an action on a window
+  wbring   Bring and focus a window on current tab
+  wselect  Select and focus a window
 #+end_example
 
 The above is current as of ~herbie version~
 
 #+begin_src shell :exports results :results output code :wrap "example"
-herbie version
+herbie -u term version
 #+end_src
 
 #+RESULTS:
 #+begin_example
 0.0.0
 #+end_example
-
-
 
 As long as this version is held at ~0.0.0~ expect breaking changes.
 
@@ -68,6 +69,9 @@ As long as this version is held at ~0.0.0~ expect breaking changes.
 
 - loops :: herbie can provide for ongoing behavior by issuing commands
   in response to herbstluftwm events aka hooks.
+
+- commands :: these include a set of actions seen elsewhere in various
+  shell scripts.
 
 The remaining sections describe each concept and how to use its
 features.
@@ -138,35 +142,30 @@ don't get used to it.
 
 ** Interactivity
 
-~herbie~ is user-interactive.  The default UI is the terminal and a
-number of others are supported.  To activate them, add the global
-command line argument ~-u~ like in:
+~herbie~ is user-interactive.  The default UI is a GUI using [[https://github.com/davatorium/rofi][rofi]] and
+~libnotify~.  An alternative UI uses the terminal.  To activate them,
+add the global command line argument ~-u~ like in:
 
 #+begin_example
-  $ herbie -u gui tasks
+  $ herbie tasks          # use default GUI
+  $ herbie -u term tasks  # use terminal
 #+end_example
 
 Some ~herbie~ commands which take arguments have fully user-interactive
 versions of the same name but with the prefix "~i~".  For example:
 
 #+begin_example
-  $ herbie -u gui itask
-  $ herbie -u gui ifini
+  $ herbie itask
+  $ herbie ifini
 #+end_example
 
 #+begin_note
-These are useful to bind to keys as described below.
+These are usefully bound to keys as described below.
 #+end_note
 
 Both ~itask~ and ~ifini~ prompt the user for a task or tag and both
 accepts an optional second tag in the response.  See their
 documentation for how this optional second tag is interpreted.
-
-#+begin_note
-When ~herbie~ uses ~dmenu~ to prompt the user a ~<Shift>+<Enter>~ may be
-required for the response to not be subject to filtering.  This is the
-case if the second optional tag is itself in the list of choices.
-#+end_note
 
 As an example, assume we already have a tag named ~dev~ and want to make
 a new tag using the ~dev~ task.  This is done using the ~herbie itask~
@@ -188,8 +187,8 @@ Sometime later we may remove this ~dev2~ tag with ~ifini~.  In this
 example we use the ~gui~ UI:
 
 #+begin_example
-  $ herbie -u gui ifini
-  (dmenu) Tag to finish: dev2 dev <Shift>+<Enter>
+  $ herbie ifini
+  Tag to finish: dev2 dev
 #+end_example
 
 This closes out ~dev2~ and leaves us in the previously existing tag
@@ -202,10 +201,9 @@ In your ~autostart~ you may have some keybindings to run ~herbie-dmenu~
 like:
 
 #+begin_example
-hc keybind $Mod-i spawn herbie -u gui itask 
-hc keybind $Mod-Shift-i spawn herbie -u gui ifini
+hc keybind $Mod-i       spawn herbie itask 
+hc keybind $Mod-Shift-i spawn herbie ifini
 #+end_example
-
 
 
 * Loops
@@ -219,7 +217,7 @@ by naming it.
 The available loops are printed with:
 
 #+begin_src shell :exports both :results output code :wrap "example"
-herbie loops
+herbie -u term loops
 #+end_src
 
 #+RESULTS:
