@@ -37,22 +37,27 @@ class UI:
                  location="mc",
                  monitor="focused",
                  lines=10,
-                 font="Fire Code 24"):
+                 retform="s",
+                 font=None):
         self.width = width
         self.location = location
         self.monitor = monitor
         self.font = font
         self.lines = 10
+        self.retform = retform
 
     @property
     def cmd(self):
-        return ["rofi", "-i", "-dmenu",
-                "-columns", "3",
-                "-monitor", monitor(self.monitor),
-                "-location", str(locations[self.location]),
-                "-width", str(self.width),
-                "-lines", str(self.lines),
-                "-font", self.font]
+        ret = ["rofi", "-i", "-dmenu",
+               "-columns", "3",
+               "-monitor", monitor(self.monitor),
+               "-location", str(locations[self.location]),
+               "-width", str(self.width),
+               "-format", self.retform,
+               "-lines", str(self.lines)]
+        if self.font:
+            ret += ["-font", self.font]
+        return ret
 
     def run(self, cmd, lines):
         print(' '.join(["'"+c+"'" for c in cmd]))

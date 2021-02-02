@@ -92,7 +92,6 @@ def waction(ctx):
     for arg, cmd in cmdlist:
         if arg != got:
             continue
-        print(cmd)
         wm(cmd)
         return
 
