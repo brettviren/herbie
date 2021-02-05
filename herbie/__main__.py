@@ -8,7 +8,7 @@ from herbie.stluft import WM
 
 from herbie.util import (
     toscreen, closescreen, 
-    select_window,
+    select_window, make_tree,
     available, get_task)
 
 import click
@@ -132,6 +132,59 @@ def save(ctx, tag):
     totree = byname[got]
     wm(f'load {tag} "{totree}"')
 
+def svg_line(x1, y1, x2, y2):
+    return f"<line stroke='gray' stroke-width='1px' x1='{x1}' y1='{y1}' x2='{x2}' y2='{y2}' />"
+
+def svg_tree(tree, x, y, w, h):
+    ratio = getattr(tree, "ratio", None)
+    if ratio is None:
+        print("svg_tree:", tree)
+        return []
+
+    if tree.orient == "horizontal":
+        lx = x + w * ratio
+        lines = [svg_line(lx, y, lx, y+h)]
+        childs = tree.children
+        if not childs:
+            return lines
+        print("horizontal:", tree, "with", len(childs))
+        lines += svg_tree(childs[0],  x, y, w*ratio, h)
+        lines += svg_tree(childs[1], lx, y, w*(1.0-ratio), h)
+        return lines
+
+    # vertical
+    ly = y + h * ratio
+    lines = [svg_line(x, ly, x+w, ly)]
+    childs = tree.children
+    print("vertical:", tree, "with", len(childs))
+    if not childs:
+        return lines
+    lines += svg_tree(childs[0], x, y, w, h*ratio) 
+    lines += svg_tree(childs[1], x, ly, w, h*(1-ratio))
+    return lines
+        
+
+
+@cli.command("svgdump")
+@click.option("-t", "--tag", type=str, default=None,
+              help="Name the tag of layout to dump, def is current tag")
+@click.option("-o", "--output", type=str, default=None,
+              help="Output svg file name")
+@click.pass_context
+def svgdump(ctx, tag, output):
+    wm = ctx.obj['wm']
+    tag = tag or wm.focused_tag
+    # todo get from x11
+    width, height = (384,216)
+    lines = [f"<svg width='{width}px' height='{height}px' xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink'>"]
+    tree = make_tree(wm(f'dump {tag}'))
+    lines += svg_tree(tree, 0, 0, width, height)
+    lines += ["</svg>"]
+    text = '\n'.join(lines)
+    if output:
+        open(output, 'wb').write(text.encode())
+    else:
+        print(text)
 
 @cli.command("save")
 @click.option("-t", "--tag", type=str, default=None,
