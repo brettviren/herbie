@@ -48,7 +48,7 @@ class UI:
 
     @property
     def cmd(self):
-        ret = ["rofi", "-i", "-dmenu",
+        ret = ["rofi", "-i", "-dmenu", "-markup-rows", "-show-icons",
                "-columns", "3",
                "-monitor", monitor(self.monitor),
                "-location", str(locations[self.location]),
@@ -61,7 +61,10 @@ class UI:
 
     def run(self, cmd, lines):
         
-        text = stringify(lines)
+        # text = stringify(lines)
+        if isinstance(lines, list):
+            lines = '\n'.join(lines)
+        print("gui.run:", type(lines), repr(lines))
 
         proc = subprocess.Popen(cmd,
                                 stdin=subprocess.PIPE,
@@ -69,7 +72,7 @@ class UI:
                                 stderr=subprocess.PIPE,
                                 universal_newlines=True,
                                 )
-        out,err = proc.communicate(text)
+        out,err = proc.communicate(lines)
         if err:
             herbie.term.echo(out)
         return out

@@ -272,19 +272,3 @@ def toscreen(wm, tag, tree):
     wm.run()
 
 
-# def switch_windows(wm):
-#     '''Switch windows.
-
-#     '''
-#     wm("new_attr string tags.focus.my_switch_order")
-#     wm("new_attr string tags.focus.my_switch_time")
-
-#     was = wm("attr tags.focus.my_switch_order").split()
-#     now = wm.wids()
-#     was = [w for w in was if w in now] # keep old if we have
-#     now = [w for w in now if w not in was] # find new
-#     wids = now + was
-#     cur = wm("attr clients.focus.winid")
-#     icur = wids.index(cur)
-
-

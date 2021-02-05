@@ -99,7 +99,7 @@ def waction(ctx):
 @click.option("-t", "--tag", type=str, default=None,
               help="Name the tag of layout to save, def is current tag")
 @click.pass_context
-def save(ctx, tag):
+def load(ctx, tag):
     '''
     Load a saved layout of the tag.
     '''
@@ -107,62 +107,52 @@ def save(ctx, tag):
     ui = ctx.obj['ui']
     tag = tag or wm.focused_tag
 
-    try:
-        stored = wm(f'attr tags.by-name.{tag}.my_layouts')
-    except RuntimeError:
+    cursexp = wm(f'dump {tag}').strip()
+    oldlays = herbie.layouts.read_store(wm, tag)
+    choices = herbie.layouts.rofi(wm, tag, oldlays, cursexp)
+
+    ui.width = -50
+    ui.retform = 'i'            # index
+    got = ui.choose(choices, "Load layout",
+                    "Pick layout to load")
+    if got is None:
         return
-    stored = stored.split('\n')
-    curtree = wm(f'dump {tag}').strip()
-    choices = list()
-    byname = dict()
-    for lay in stored:
-        if not lay:
-            continue
-        name, tree = lay.split(':', 1)
-        byname[name] = tree
-        if tree == curtree:
-            name += f'\tsame:{tree}' 
-        else:
-            name += f'\tdiff:{tree}'
-        choices.append(name)
-    got = ui.choose(choices, "Load name")
+    try:
+        got = int(got)
+    except ValueError:
+        return
+    lay = oldlays[got]
+    wm(f'load {tag} "{lay.sexp}"')
+
+@cli.command("save")
+@click.option("-t", "--tag", type=str, default=None,
+              help="Name the tag of layout to save, def is current tag")
+@click.option("-p", "--purge", is_flag=True, default=False,
+              help="Purge prior saves before adding the current layout")
+@click.pass_context
+def save(ctx, tag, purge):
+    '''
+    Add the current layout to those saved on the tag.
+    '''
+    wm = ctx.obj['wm']
+    ui = ctx.obj['ui']
+    tag = tag or wm.focused_tag
+
+    if purge:
+        herbie.layouts.purge(wm, tag)
+
+    cursexp = wm(f'dump {tag}').strip()
+    oldlays = herbie.layouts.read_store(wm, tag)
+    choices = herbie.layouts.rofi(wm, tag, oldlays, cursexp)
+
+    ui.width = -50
+    got = ui.choose(choices, "Save layout to",
+                    "Give a new name or overwrite existing")
     if not got:
         return
     got = got.strip().split()[0]
-    totree = byname[got]
-    wm(f'load {tag} "{totree}"')
+    herbie.layouts.add_store(wm, herbie.layouts.Layout(got, cursexp), tag)
 
-def svg_line(x1, y1, x2, y2):
-    return f"<line stroke='gray' stroke-width='1px' x1='{x1}' y1='{y1}' x2='{x2}' y2='{y2}' />"
-
-def svg_tree(tree, x, y, w, h):
-    ratio = getattr(tree, "ratio", None)
-    if ratio is None:
-        print("svg_tree:", tree)
-        return []
-
-    if tree.orient == "horizontal":
-        lx = x + w * ratio
-        lines = [svg_line(lx, y, lx, y+h)]
-        childs = tree.children
-        if not childs:
-            return lines
-        print("horizontal:", tree, "with", len(childs))
-        lines += svg_tree(childs[0],  x, y, w*ratio, h)
-        lines += svg_tree(childs[1], lx, y, w*(1.0-ratio), h)
-        return lines
-
-    # vertical
-    ly = y + h * ratio
-    lines = [svg_line(x, ly, x+w, ly)]
-    childs = tree.children
-    print("vertical:", tree, "with", len(childs))
-    if not childs:
-        return lines
-    lines += svg_tree(childs[0], x, y, w, h*ratio) 
-    lines += svg_tree(childs[1], x, ly, w, h*(1-ratio))
-    return lines
-        
 
 
 @cli.command("svgdump")
@@ -172,73 +162,12 @@ def svg_tree(tree, x, y, w, h):
               help="Output svg file name")
 @click.pass_context
 def svgdump(ctx, tag, output):
+
     wm = ctx.obj['wm']
     tag = tag or wm.focused_tag
-    # todo get from x11
-    width, height = (384,216)
-    lines = [f"<svg width='{width}px' height='{height}px' xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink'>"]
     tree = make_tree(wm(f'dump {tag}'))
-    lines += svg_tree(tree, 0, 0, width, height)
-    lines += ["</svg>"]
-    text = '\n'.join(lines)
-    if output:
-        open(output, 'wb').write(text.encode())
-    else:
-        print(text)
-
-@cli.command("save")
-@click.option("-t", "--tag", type=str, default=None,
-              help="Name the tag of layout to save, def is current tag")
-@click.option("-p", "--purge", is_flag=True, default=False,
-              help="Purge any saved layouts")
-@click.pass_context
-def save(ctx, tag, purge):
-    '''
-    Save the layout of the tag.
-    '''
-    wm = ctx.obj['wm']
-    ui = ctx.obj['ui']
-    tag = tag or wm.focused_tag
-
-    try:
-        wm(f'new_attr string tags.by-name.{tag}.my_layouts')
-    except RuntimeError:
-        pass            # assume alread set
-
-    if purge:
-        wm(f'set_attr tags.by-name.{tag}.my_layouts ""')
-
-    # layouts are stored as \n-delim lines of ASCII units.  Each
-    # layout has a name followed by a colon and the rest is the layout
-    # tree as from hc dump.
-    stored = wm(f'attr tags.by-name.{tag}.my_layouts').split('\n')
-    print('STORED:',stored)
-    curtree = wm(f'dump {tag}').strip()
-    byname = dict()
-    choices = list()
-    for lay in stored:
-        if not lay:
-            continue
-        print(f'xxx{lay}xxx')
-        name, tree = lay.split(':', 1)
-        byname[name] = tree
-        if tree == curtree:
-            name += f'\tsame:{tree}' 
-        else:
-            name += f'\tdiff:{tree}'
-        choices.append(name)
-
-    got = ui.choose(choices, "Save name",
-                    "Give a new name or overwrite existing")
-    if not got:
-        return
-    got = got.strip().split()[0]
-    byname[got] = curtree
-    tosave = [k+':'+v for k,v in sorted(byname.items())]
-    text = '\n'.join(tosave)
-    print(f'saving:\n{text}')
-    wm(f'set_attr tags.by-name.{tag}.my_layouts "{text}"')
-    
+    # fixme: auto determine width/height
+    herbie.svg.make_icon(output, tree)
 
 
 @cli.command("tags")

@@ -71,6 +71,41 @@ class WM:
             return text
         return parse_attrs(text)
 
+    def del_my_attr(self, attr, tag = None):
+        '''
+        Remove custom "my" attribute (attr does not have "my_" prefix)
+        '''
+        tag = tag or self.focused_tag
+        try:
+            self(f'remove_attr tags.by-name.{tag}.my_{attr}')
+        except RuntimeError:
+            pass
+
+    def get_my_attr(self, attr, tag = None):
+        '''
+        Return custom "my" attribute (attr does not have "my_" prefix)
+        '''
+        tag = tag or self.focused_tag
+        try:
+            return self(f'attr tags.by-name.{tag}.my_{attr}')
+        except RuntimeError:
+            return 
+    
+    def set_my_attr(self, attr, value, tag = None):
+        '''
+        Set custom "my" attribute (attr does not have "my_" prefix)
+
+        fixme: currently only string value supported.
+        '''
+        tag = tag or self.focused_tag
+        atype = "string"        # fixme, allow other types
+        text = str(value)
+        try:
+            self(f'new_attr {atype} tags.by-name.{tag}.my_{attr}')
+        except RuntimeError:
+            pass            # assume alread set
+        self(f'set_attr tags.by-name.{tag}.my_{attr} "{text}"')
+
     def taginfo(self, name_or_index=None):
         '''
         Return tag info for tag given by name or index or current.
