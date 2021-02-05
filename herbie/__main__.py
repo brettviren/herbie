@@ -95,6 +95,99 @@ def waction(ctx):
         wm(cmd)
         return
 
+@cli.command("load")
+@click.option("-t", "--tag", type=str, default=None,
+              help="Name the tag of layout to save, def is current tag")
+@click.pass_context
+def save(ctx, tag):
+    '''
+    Load a saved layout of the tag.
+    '''
+    wm = ctx.obj['wm']
+    ui = ctx.obj['ui']
+    tag = tag or wm.focused_tag
+
+    try:
+        stored = wm(f'attr tags.by-name.{tag}.my_layouts')
+    except RuntimeError:
+        return
+    stored = stored.split('\n')
+    curtree = wm(f'dump {tag}').strip()
+    choices = list()
+    byname = dict()
+    for lay in stored:
+        if not lay:
+            continue
+        name, tree = lay.split(':', 1)
+        byname[name] = tree
+        if tree == curtree:
+            name += f'\tsame:{tree}' 
+        else:
+            name += f'\tdiff:{tree}'
+        choices.append(name)
+    got = ui.choose(choices, "Load name")
+    if not got:
+        return
+    got = got.strip().split()[0]
+    totree = byname[got]
+    wm(f'load {tag} "{totree}"')
+
+
+@cli.command("save")
+@click.option("-t", "--tag", type=str, default=None,
+              help="Name the tag of layout to save, def is current tag")
+@click.option("-p", "--purge", is_flag=True, default=False,
+              help="Purge any saved layouts")
+@click.pass_context
+def save(ctx, tag, purge):
+    '''
+    Save the layout of the tag.
+    '''
+    wm = ctx.obj['wm']
+    ui = ctx.obj['ui']
+    tag = tag or wm.focused_tag
+
+    try:
+        wm(f'new_attr string tags.by-name.{tag}.my_layouts')
+    except RuntimeError:
+        pass            # assume alread set
+
+    if purge:
+        wm(f'set_attr tags.by-name.{tag}.my_layouts ""')
+
+    # layouts are stored as \n-delim lines of ASCII units.  Each
+    # layout has a name followed by a colon and the rest is the layout
+    # tree as from hc dump.
+    stored = wm(f'attr tags.by-name.{tag}.my_layouts').split('\n')
+    print('STORED:',stored)
+    curtree = wm(f'dump {tag}').strip()
+    byname = dict()
+    choices = list()
+    for lay in stored:
+        if not lay:
+            continue
+        print(f'xxx{lay}xxx')
+        name, tree = lay.split(':', 1)
+        byname[name] = tree
+        if tree == curtree:
+            name += f'\tsame:{tree}' 
+        else:
+            name += f'\tdiff:{tree}'
+        choices.append(name)
+
+    got = ui.choose(choices, "Save name",
+                    "Give a new name or overwrite existing")
+    if not got:
+        return
+    got = got.strip().split()[0]
+    byname[got] = curtree
+    tosave = [k+':'+v for k,v in sorted(byname.items())]
+    text = '\n'.join(tosave)
+    print(f'saving:\n{text}')
+    wm(f'set_attr tags.by-name.{tag}.my_layouts "{text}"')
+    
+
+
 @cli.command("tags")
 @click.option("-o","--order", default="index",
               type=click.Choice(["index","name"]),

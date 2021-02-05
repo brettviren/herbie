@@ -73,6 +73,11 @@ def select_window(wm, ui, tags = None, ignore_focus=True,
     got = ui.choose(lines, 'Select window: ')
     if got is None:
         return
+    try:
+        got = int(got)
+    except ValueError:
+        return
+
     return choice[int(got)]['winid']
     
 

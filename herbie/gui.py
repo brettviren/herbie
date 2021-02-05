@@ -60,9 +60,9 @@ class UI:
         return ret
 
     def run(self, cmd, lines):
-        print(' '.join(["'"+c+"'" for c in cmd]))
+        
         text = stringify(lines)
-        print(text)
+
         proc = subprocess.Popen(cmd,
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
