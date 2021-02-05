@@ -35,8 +35,11 @@ Commands:
   fini     Finish a task screen by closing all windows and removing the tag
   ifini    Interactively finish a task screen by closing all windows and...
   itask    Interactively figure how to fill screen with task layout
+  load     Load a saved layout of the tag.
   loop     Run a looper
   loops    List known loopers
+  save     Add the current layout to those saved on the tag.
+  svgdump
   tags     Print tags one line at a time in order
   task     Fill screen with task layout
   tasks    List known tasks
@@ -70,19 +73,24 @@ As long as this version is held at ~0.0.0~ expect breaking changes.
 - loops :: herbie can provide for ongoing behavior by issuing commands
   in response to herbstluftwm events aka hooks.
 
-- commands :: these include a set of actions seen elsewhere in various
-  shell scripts.
+- commands :: these are on-shot manipulations, some using [[https://github.com/davatorium/rofi][rofi]] if
+  interactive user choice is needed.
 
 The remaining sections describe each concept and how to use its
 features.
 
 * Tasks
 
-So far, ~herbie~ is focused on the idea of a "task" which for ~herbie~
-means a herbstluftwm "tag" holding a certain layout which is populated
-with specific windows.  Here is the result of a task called ~dev~.
+~herbie~'s concept of a "task" is not something ~herbie~ does but
+something you do.  A task a herbstluftwm "tag" holding a certain
+pre-defined layout of frames which is populated with specific windows.
+Here is the result of a task called ~dev~.
 
 [[file:docs/ss.png][file:docs/ss-thumb.png]]
+
+The number of frames, their ratios and orientation and their window
+contents are all predetermined.  With a single command one can remake
+this layout and one can have multiple tags that use the layout.
 
 ** Assure a task
 
@@ -242,4 +250,51 @@ add them at the end of your ~autostart~ file such as below where
 #+begin_example
 herbie loop stamp &
 herbie loop switch &
+#+end_example
+
+* Commands
+
+What remains are simply commands.  
+
+** ~save~ and ~load~
+
+~herbie~ can save and load frame/window layouts.  A ~herbie save~ will
+store the result of ~herbstclient dump~ for the current layout to the
+current tag.  And a ~herbie load~ can restore it.  A layout is stored by
+name for later recall and ~herbie~ uses ~rofi~ to prompt for a new layout
+name or reuse an old layout name.  For example:
+
+[[file:loadsave.png]]
+
+
+This shows four layouts which have been saved.  Layout names colored
+in green (~lay4~) indicate they match the current layout while those in
+red differ.  The icon represents the actual frames corresponding to
+the stored layouts.  Selecting a red layout will then readjust the
+current frames to match.
+
+Example bindings
+
+#+begin_example
+  # Mnemonic: Emacs's k-kill / y-yank
+  hc keybind $Mod-k spawn herbie save
+  hc keybind $Mod-y spawn herbie load
+#+end_example
+
+** The "w" commands
+
+Several command relate to windows and are reimplementations of
+"classic" herbstlufwm scripts in ~herbie~ just to keep them together.
+
+- waction :: a rofi "context" menu attached to the current window
+- wbring :: bring some window from another tag to the current one
+- wselect :: pick a window on current tag or all tags and make it focused, order choices by most recently to least recently used with current focus last
+
+Example bindings
+
+#+begin_example
+  hc keybind $Mod-b        spawn herbie wbring
+  hc keybind $Mod-n        spawn herbie wselect
+  hc keybind $Mod-Shift-n  spawn herbie wselect -t all
+  hc keybind $Mod-w        spawn herbie waction
 #+end_example
