@@ -74,7 +74,7 @@ class UI:
                                 )
         out,err = proc.communicate(lines)
         if err:
-            herbie.term.echo(out)
+            sys.stderr.write(out + '\n')
         return out
 
     def echo(self, text, title=None):
