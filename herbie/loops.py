@@ -68,44 +68,62 @@ def loop_switch(wm):
 
 def loop_stamp(wm):
     '''
-    Set a focus_time attribute on windows
+    Set a focus_time attribute on windows and tags
     '''
     now = time.time()
 
-    # first, hit each window to give assure it has a my_focus_time
+    #print(f'start stamp loop {now}')
+
+    # first, hit each tag and window to assure it has a my_focus_time
     # attribute set.
+    for tagdot in wm("complete 1 attr tags.by-name.").split('\n'):
+        tag = tagdot.split('.',1)[0].strip()
+        if not tag:
+            continue
+        #print(f"tag {tag} my_focus_time")
+        try:
+            wm(f'new_attr string tags.by-name.{tag}.my_focus_time {now}')
+        except RuntimeError:
+            pass            # assume alread set
+        
     clis = wm("complete 1 attr clients.")
     for cli in clis.split('\n'):
         parts = cli.strip().split('.')
         if len(parts) < 2:
             continue
-        if not parts[1].startswith('0x'):
+        wid = parts[1].strip()
+        if not wid.startswith('0x'):
             continue
-        wid=parts[1]
+        #print(f"window {wid} my_focus_time")
         try:
             wm(f'new_attr string clients.{wid}.my_focus_time {now}')
         except RuntimeError:
             pass            # assume alread set
 
-    for event in wm.events('focus_changed|reload'):
-        print(event)
+    for event in wm.events('tag_changed|focus_changed|reload'):
+        #print(f'loop stamp with event {event}')
+        now = time.time()
         parts = event.split('\t')
         evt = parts[0]
 
         if evt == "reload":
             break
 
-        # focus_changed
-        wid = parts[1]
-        if wid == "0x0":
-            continue
-        now = time.time()
-        try:
-            wm(f'set_attr clients.{wid}.my_focus_time {now}')
-            continue
-        except RuntimeError:
-            pass
-        wm(f'new_attr string clients.{wid}.my_focus_time {now}')        
+        if evt == "tag_changed":
+            tag = parts[1]
+            try:
+                wm(f'set_attr tags.by-name.{tag}.my_focus_time {now}')
+            except RuntimeError:
+                pass
+
+        if evt == "focus_changed":
+            wid = parts[1]
+            if wid == "0x0":
+                continue
+            try:
+                wm(f'set_attr clients.{wid}.my_focus_time {now}')
+            except RuntimeError:
+                pass
 
 def loop_stamp_switch(wm):
     # track tags of clients with timestamps
@@ -141,7 +159,7 @@ def loop_stamp_switch(wm):
         seq_last_time = now
         seq_last_event = evt
 
-        print (in_sequence, tag, cli, event)
+        #print (in_sequence, tag, cli, event)
 
         if in_sequence:
 
