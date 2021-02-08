@@ -76,6 +76,16 @@ def write_store(wm, layouts, tag=None):
     wm.set_my_attr(attr_name, text, tag)
 
 
+def make_icons(oldlays, tag):
+    ret = list()
+    for lay in oldlays:
+        tree = make_tree(lay.sexp)
+        iname = f'herbie{tag}{lay.name}'
+        fname = make_icon(iname, tree)
+        ret.append(iname)
+    return ret
+
+
 def rofi(wm, tag, oldlays, cursexp=None):
     '''Return text rendered for rofi representing stored and current layout.
 

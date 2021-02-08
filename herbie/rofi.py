@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
-from .layouts import add_store, del_store, read_store, Layout
+from .layouts import (
+    add_store, del_store, read_store, make_icons, Layout)
 import rofi_menu as menu
 
 BAIL = menu.Operation(menu.OP_EXIT)
@@ -83,10 +84,13 @@ def layout_menu(wm, which=None, tag = None):
     tag = tag or wm.focused_tag
     cursexp = wm(f'dump {tag}').strip()
     oldlays = read_store(wm, tag)
+    icons = make_icons(oldlays, tag)
 
-    kwargs = [dict(text=layout_text(lay, cursexp),
-                   wm=wm, tag=tag, lay=lay, cursexp=cursexp)
-              for lay in oldlays]
+    kwargs = list()
+    for lay,icon in zip(oldlays,icons):
+        kwargs.append(dict(
+            text=layout_text(lay, cursexp), icon=icon,
+            wm=wm, tag=tag, lay=lay, cursexp=cursexp))
 
     if which is None or which == "all":
         which = "load save drop".split()

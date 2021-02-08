@@ -129,7 +129,7 @@ def do_layout(ctx, tag, action, args):
               help="Operation to perform")
 @click.argument("args", nargs=-1)
 @click.pass_context
-def do_layout(ctx, tag, action, args):
+def big_modi_layout(ctx, tag, action, args):
     '''
     Command to operate on layouts from a rofi script.
     action in {load, save, drop}
