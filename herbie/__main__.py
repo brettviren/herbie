@@ -100,6 +100,30 @@ def waction(ctx):
 @cli.command("layout")
 @click.option("-t", "--tag", type=str, default=None,
               help="Name the tag or current tag")
+@click.option("-a", "--action",
+              type=click.Choice(["load","save","drop","all"]),
+              default="all",
+              help="Name layout action")
+@click.argument("args", nargs=-1)
+@click.pass_context
+def do_layout(ctx, tag, action, args):
+    '''
+    rofi -modi "l:herbie layout -a load" -show l
+    rofi -modi "s:herbie layout -a save" -show s
+    rofi -modi "d:herbie layout -a drop" -show d
+    rofi -modi "a:herbie layout -a all" -show a 
+    '''
+    from herbie import rofi
+    wm = ctx.obj['wm']
+    tag = tag or wm.focused_tag
+    lm = rofi.layout_menu(wm, action, tag)
+    rofi.menu.run(lm, rofi_version="1.6", debug=False)
+    
+
+
+@cli.command("big-modi-layout")
+@click.option("-t", "--tag", type=str, default=None,
+              help="Name the tag or current tag")
 @click.option("-a", "--action", default="save",
               type=click.Choice(["load","save","drop"]),
               help="Operation to perform")

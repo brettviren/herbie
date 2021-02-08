@@ -18,6 +18,7 @@ setuptools.setup(
         "click",
         "sexpdata",
         "anytree",
+        "rofi_menu",
         "vext",
         "vext.gi",
     ],
