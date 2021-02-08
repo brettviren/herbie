@@ -4,6 +4,7 @@ to herbstluftwm.  Until then, there is this.
 '''
 import sys
 import herbie
+from herbie import rofi
 
 from herbie.stluft import WM
 
@@ -33,11 +34,13 @@ def version(ctx):
     'Print the version'
     ctx.obj["ui"].echo(herbie.__version__)
 
-@cli.command("wselect")
+
+
+@cli.command("oldwselect")
 @click.option("-t", "--tags", type=str, default=None,
               help="Which tags to consider, focus=None or all or other")
 @click.pass_context
-def wselect(ctx, tags):
+def oldwselect(ctx, tags):
     'Select and focus a window'
 
     if tags is None or tags == "focus":
@@ -56,9 +59,40 @@ def wselect(ctx, tags):
     if got:
         wm(f'jumpto {got}')
 
-@cli.command("wbring")
+@cli.command("wselect")
+@click.option("-t", "--tags",
+              type=click.Choice(["focus","all","other"]),
+              default="focus",
+              help="Which tags to consider")
+@click.argument("args", nargs=-1)
 @click.pass_context
-def wbring(ctx):
+def wselect(ctx, tags, args):
+    wm = ctx.obj['wm']
+    m = rofi.window_cmd_menu(wm, tags,
+                             "Select window", "jumpto {winid}")
+    rofi.menu.run(m, rofi_version="1.6", debug=False)
+
+
+@cli.command("wbring")
+@click.option("-t", "--tags", 
+              type=click.Choice(["focus","all","other"]),
+              default="other",
+              help="Which tags to consider")
+@click.argument("args", nargs=-1)
+@click.pass_context
+def wbring(ctx, tags, args):
+    '''
+    
+    '''
+    wm = ctx.obj['wm']
+    m = rofi.window_cmd_menu(wm, tags,
+                             "Bring window", "bring {winid}")
+    rofi.menu.run(m, rofi_version="1.6", debug=False)
+    
+
+@cli.command("oldwbring")
+@click.pass_context
+def oldwbring(ctx):
     'Bring and focus a window on current tab'
     wm = ctx.obj['wm']
     ui = ctx.obj['ui']
@@ -113,7 +147,6 @@ def do_layout(ctx, tag, action, args):
     rofi -modi "d:herbie layout -a drop" -show d
     rofi -modi "a:herbie layout -a all" -show a 
     '''
-    from herbie import rofi
     wm = ctx.obj['wm']
     tag = tag or wm.focused_tag
     lm = rofi.layout_menu(wm, action, tag)
