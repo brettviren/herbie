@@ -2,6 +2,7 @@
 '''Someday a true rain will come and wash out a real Python interface
 to herbstluftwm.  Until then, there is this.
 '''
+import sys
 import herbie
 
 from herbie.stluft import WM
@@ -94,6 +95,60 @@ def waction(ctx):
             continue
         wm(cmd)
         return
+
+
+@cli.command("layout")
+@click.option("-t", "--tag", type=str, default=None,
+              help="Name the tag or current tag")
+@click.option("-a", "--action", default="save",
+              type=click.Choice(["load","save","drop"]),
+              help="Operation to perform")
+@click.argument("args", nargs=-1)
+@click.pass_context
+def do_layout(ctx, tag, action, args):
+    '''
+    Command to operate on layouts from a rofi script.
+    action in {load, save, drop}
+    '''
+    wm = ctx.obj['wm']
+    tag = tag or wm.focused_tag
+
+    sys.stderr.write(f'{tag} {action} {args}\n')
+
+    NUL = '\0'
+    GS = '\x1d'                    # ascii group separator
+    RS = '\x1e'                    # ascii record separator
+    US = '\x1f'                    # ascii unit separator
+    NL = '\n'
+
+    sys.stdout.write(f'{NUL}message{US}<b>{action.capitalize()}</b> layouts for <b>{tag}</b> tag{NL}')
+    sys.stdout.write(f'{NUL}markup-rows{US}true{NL}')
+    sys.stdout.write(f'{NUL}prompt{US}layout to {action}{NL}')
+
+    cursexp = wm(f'dump {tag}').strip()
+    oldlays = herbie.layouts.read_store(wm, tag)
+    choices, lays = herbie.layouts.rofi(wm, tag, oldlays, cursexp)
+
+    meths = {
+        "save": lambda lay : herbie.layouts.add_store(wm, lay, tag),
+        "drop": lambda lay : herbie.layouts.del_store(wm, lay, tag),
+        "load": lambda lay : wm(f'load {tag} "{lay.sexp}"'),
+    }
+    meth = meths[action]
+
+    if args:                    # got selection
+        for arg in args:
+            try:
+                lay = lays[arg]
+            except KeyError:
+                lay = herbie.layouts.Layout(arg, cursexp)
+            meth(lay)
+        return
+
+    # if no args, print rofi items
+    for choice in choices:
+        print(choice)
+
 
 @cli.command("load")
 @click.option("-t", "--tag", type=str, default=None,

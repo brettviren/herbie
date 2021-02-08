@@ -53,12 +53,20 @@ def add_store(wm, lay, tag=None):
     If lay is found by name in store, set its sexp, else append.
     '''
     lays = read_store(wm, tag)
-    have = [l for l in lays if l.name == lay.name]
-    if have:
-        have[0].sexp = lay.sexp
-    else:
-        lays.append(lay)
+    lays = list(filter(lambda l: l.name != lay.name, lays))
+    lays.append(lay)
     write_store(wm, lays, tag)
+
+def del_store(wm, lay, tag=None):
+    '''
+    If lay is found by name in store, remove it.
+    '''
+    lays = read_store(wm, tag)
+    keep = list()
+    for have in lays:
+        if have.name != lay.name:
+            keep.append(have)
+    write_store(wm, keep, tag)
 
 def write_store(wm, layouts, tag=None):
     '''
@@ -75,10 +83,11 @@ def rofi(wm, tag, oldlays, cursexp=None):
     then the render will emphasize this.
     '''
     lines = []
+    index = dict()
     for lay in oldlays:
 
-        print ("cur:",cursexp)
-        print ("lay:",lay.sexp)
+        #print ("cur:",cursexp)
+        #print ("lay:",lay.sexp)
         if cursexp and cursexp == lay.sexp:
             lname = f'<span color="green">{lay.name}</span>'
         else:
@@ -87,6 +96,7 @@ def rofi(wm, tag, oldlays, cursexp=None):
         tree = make_tree(lay.sexp)
         iname = f'herbie{tag}{lay.name}'
         fname = make_icon(iname, tree)
-        line = f'{lname}{NUL}icon{US}{iname}'
+        line = f'{lname}{NUL}icon{US}{iname}{NUL}name{US}{lay.name}'
         lines.append(line)
-    return lines
+        index[lname] = lay
+    return lines, index
