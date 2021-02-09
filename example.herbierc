@@ -1,0 +1,41 @@
+[window firefox]
+title = Mozilla Firefox
+command = firefox -P default-esr
+
+[window firefox-bv]
+title = Mozilla Firefox
+command = firefox -P brett
+
+[window emacs]
+class = Emacs
+command = emacs
+
+[window kitty]
+class = kitty
+command = kitty
+
+[window liferea]
+class = Liferea
+command = liferea
+
+[tasks]
+dweb = (clients window:firefox)
+
+bweb = (clients window:firefox-bv)
+
+rss = (split horizontal:0.75:1
+        (clients window:firefox)
+        (split vertical:0.50:0
+          (clients window:liferea)
+          (clients )))
+
+dev = (split horizontal:0.50:1
+         (clients window:emacs)
+         (clients window:kitty
+                  window:firefox))
+
+devbar = (split vertical:0.75:1
+            (split horizontal:0.5:0
+              (clients window:emacs)
+              (clients window:firefox))
+            (clients window:kitty))

@@ -93,13 +93,6 @@ def available(thing="task"):
             lines.append(one.split('_',1)[1])
     return lines
 
-def get_task(task):
-    '''
-    Return named task tree.
-    '''
-    import herbie.tasks
-    meth = getattr(herbie.tasks, 'task_'+task)
-    return meth()
 
 def stringify(something, ending=None):
     if not isinstance(something, str):
@@ -111,43 +104,63 @@ def stringify(something, ending=None):
 
 def tree_from_sexp(sexp, parent=None):
     '''
-    Interpret sexp as from "hc dump" and turn into node tree.
+    Transform a sexp from "hc dump" and to a more regularized node tree.
     '''
     index = 0
     if parent:
         index = len(parent.children)
     node = binode(parent, index)
-    what = sexp.pop(0).value()
+    node.what = sexp.pop(0).value()
+    setattr(node, node.what, True)
+
+    node.attrs = list()
+
     for term in sexp:
         if isinstance(term, list):
             tree_from_sexp(term, node)
             continue
+
         val = term.value()
-        if val.startswith("vertical:") or val.startswith("horizontal:"):
-            parts = val.split(":")
-            node.orient = parts.pop(0)
+        try:
+            key,value = val.split(":",1)
+        except ValueError:
+            key = val
+            value = None
+
+        if key not in ["window"]:
+            node.attrs.append(val)
+
+        if key in ["vertical", "horizontal"]:
+            node.orient = key
+            parts = value.split(":")
             node.ratio = float(parts.pop(0))
             if parts:
                 node.selection=int(parts.pop(0))
             continue
 
-        if val.startswith("grid:"):
-            parts = val.split(":")
-            node.orient = parts.pop(0)
-            # fixme:
-            node.grid = int(parts.pop(0))            
+        if key == "grid":
+            node.orient = key
+            node.grid = int(value)
             continue
 
-        if val.startswith("max:"):
+        if key == "max":
             continue
 
-        if val.startswith("0x"):
+        if key.startswith("0x"):
             wids = getattr(node, "wids", list())
             wids.append(val)
             node.wids = wids
             continue
 
+        if key == "window":
+            windows = getattr(node, "windows", list())
+            windows.append(value)
+            node.windows = windows
+            continue
+
         raise ValueError(f'Unknown: {term}')
+    if node.what == "clients" and not node.attrs:
+        node.attrs.append("vertical:0")
     return node
 
 def make_tree(dump):
@@ -172,17 +185,12 @@ def binode(parent=None, name="",**kwds):
 
 
 
-def render_split(tree):
+def render_split(node):
     '''
-    Render tree as argument to 'hc load'
+    Render tree back to the sexp suitable for 'hc load'
     '''
-    split = getattr(tree, "split", None)
-    if not split:
-        return
-    ratio = getattr(tree, "ratio", 0.5)
-
     csplits = list()
-    for child in tree.children:
+    for child in node.children:
         csplit = render_split(child)
         if csplit:
             csplits.append(csplit)
@@ -190,7 +198,8 @@ def render_split(tree):
     if csplits:
         children = ' '
         children += ' '.join(csplits)
-    return f'(split {split}:{ratio}:0{children})'
+    attrs = ' '.join(node.attrs)
+    return f'({node.what} {attrs}{children})'
 
 
 
@@ -223,52 +232,4 @@ def closescreen(wm, tag, goto=None):
         wm.add(f'merge_tag {tag} {mergeto}')
     #print(wm._chain)
     wm.run()
-
-def toscreen(wm, tag, tree):
-    '''
-    Put tree to tag, idempotently
-    '''
-    if tag is None:
-        tag = task
-
-    #print("Tree:",tree)
-    
-    try:
-        wm.taginfo(tag)
-    except KeyError:
-        wm(f'add {tag}')
-
-    layout = render_split(tree)
-    if layout:
-        #print("Layout:",layout)
-        wm(f'load {tag} "{layout}"')
-
-    text = wm(f'dump {tag}')
-    #print ('dump:',text)
-    have = make_tree(text)
-
-    # walk tree and have, building as needed
-    r = Resolver()
-    for node in [tree] + list(tree.descendants):
-        if not hasattr(node, 'command'):
-            continue
-        pathlist = [str(n.name) for n in node.path]
-        path = '/'.join(pathlist)
-        path = '/' + path
-        try:
-            got = r.get(have, path)
-            got = getattr(got, "wids", None)
-        except ChildResolverError:
-            got = None
-        if got:
-            continue
-        match = ' '.join(['%s="%s"'%(k,v) for k,v in node.match.items()])
-        index = ''.join(pathlist[1:])
-        wm.add(f'rule once {match} tag={tag} index={index} maxage=10')
-        wm.add(f'spawn {node.command}')
-    
-    wm.add("focus_monitor 0")
-    wm.add(f'use {tag}')
-    wm.run()
-
 

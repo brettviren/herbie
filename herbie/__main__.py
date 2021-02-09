@@ -2,16 +2,17 @@
 '''Someday a true rain will come and wash out a real Python interface
 to herbstluftwm.  Until then, there is this.
 '''
+import os
 import sys
+import configparser
 import herbie
+import herbie.tasks
 from herbie import rofi
-
 from herbie.stluft import WM
-
 from herbie.util import (
-    toscreen, closescreen, 
+    closescreen, 
     select_window, make_tree,
-    available, get_task)
+    available)
 
 import click
 @click.group()
@@ -21,43 +22,28 @@ import click
               default="gui",
               type=click.Choice(["term", "gui"]), 
               help="Set user interface")
+@click.option("-c","--config",
+              default=[os.environ["HOME"]+"/.herbierc"],
+              envvar='HERBIERC',
+              multiple=True,
+              type=click.Path(),
+              help="Set configuration file")
 @click.pass_context
-def cli(ctx, hc, ui):
+def cli(ctx, hc, ui, config):
     import importlib
     uimod = importlib.import_module("herbie."+ui)
     ctx.obj["ui"] = uimod.UI()
     ctx.obj["wm"] = WM(hc)
+    cfg = configparser.ConfigParser()
+    print(config)
+    cfg.read(config)
+    ctx.obj["cfg"] = cfg 
 
 @cli.command()
 @click.pass_context
 def version(ctx):
-    'Print the version'
+    'Print the version.'
     ctx.obj["ui"].echo(herbie.__version__)
-
-
-
-@cli.command("oldwselect")
-@click.option("-t", "--tags", type=str, default=None,
-              help="Which tags to consider, focus=None or all or other")
-@click.pass_context
-def oldwselect(ctx, tags):
-    'Select and focus a window'
-
-    if tags is None or tags == "focus":
-        tags = None
-    elif tags in ["all","other"]:
-        tags = tags
-    else:
-        tags = tags.split(",")
-
-    wm = ctx.obj['wm']
-    ui = ctx.obj['ui']
-    ui.monitor = "focused"
-    ui.width = -50
-
-    got = select_window(wm, ui, tags)
-    if got:
-        wm(f'jumpto {got}')
 
 @cli.command("wselect")
 @click.option("-t", "--tags",
@@ -67,6 +53,9 @@ def oldwselect(ctx, tags):
 @click.argument("args", nargs=-1)
 @click.pass_context
 def wselect(ctx, tags, args):
+    '''
+    Select a window for focus.
+    '''
     wm = ctx.obj['wm']
     m = rofi.window_cmd_menu(wm, tags,
                              "Select window", "jumpto {winid}")
@@ -82,7 +71,7 @@ def wselect(ctx, tags, args):
 @click.pass_context
 def wbring(ctx, tags, args):
     '''
-    
+    Bring a window to a tag.
     '''
     wm = ctx.obj['wm']
     m = rofi.window_cmd_menu(wm, tags,
@@ -90,23 +79,11 @@ def wbring(ctx, tags, args):
     rofi.menu.run(m, rofi_version="1.6", debug=False)
     
 
-@cli.command("oldwbring")
-@click.pass_context
-def oldwbring(ctx):
-    'Bring and focus a window on current tab'
-    wm = ctx.obj['wm']
-    ui = ctx.obj['ui']
-    ui.monitor = "focused"
-    ui.width = -50
-    got = select_window(wm, ui, "other")
-    if got:
-        wm(f'bring {got}')
-
 @cli.command("waction")
 @click.pass_context
 def waction(ctx):
     '''
-    Select and perform an action on a window
+    Select and perform an action on a window.
     '''
     wm = ctx.obj['wm']
     cmdlist = [
@@ -142,10 +119,14 @@ def waction(ctx):
 @click.pass_context
 def do_layout(ctx, tag, action, args):
     '''
-    rofi -modi "l:herbie layout -a load" -show l
-    rofi -modi "s:herbie layout -a save" -show s
-    rofi -modi "d:herbie layout -a drop" -show d
-    rofi -modi "a:herbie layout -a all" -show a 
+    A rofi modi for loading, saving, dropping layouts.
+
+    Example commands:
+
+        rofi -modi "l:herbie layout -a load" -show l
+        rofi -modi "s:herbie layout -a save" -show s
+        rofi -modi "d:herbie layout -a drop" -show d
+        rofi -modi "a:herbie layout -a all" -show a 
     '''
     wm = ctx.obj['wm']
     tag = tag or wm.focused_tag
@@ -154,132 +135,29 @@ def do_layout(ctx, tag, action, args):
     
 
 
-@cli.command("big-modi-layout")
-@click.option("-t", "--tag", type=str, default=None,
-              help="Name the tag or current tag")
-@click.option("-a", "--action", default="save",
-              type=click.Choice(["load","save","drop"]),
-              help="Operation to perform")
-@click.argument("args", nargs=-1)
-@click.pass_context
-def big_modi_layout(ctx, tag, action, args):
-    '''
-    Command to operate on layouts from a rofi script.
-    action in {load, save, drop}
-    '''
-    wm = ctx.obj['wm']
-    tag = tag or wm.focused_tag
-
-    sys.stderr.write(f'{tag} {action} {args}\n')
-
-    NUL = '\0'
-    GS = '\x1d'                    # ascii group separator
-    RS = '\x1e'                    # ascii record separator
-    US = '\x1f'                    # ascii unit separator
-    NL = '\n'
-
-    sys.stdout.write(f'{NUL}message{US}<b>{action.capitalize()}</b> layouts for <b>{tag}</b> tag{NL}')
-    sys.stdout.write(f'{NUL}markup-rows{US}true{NL}')
-    sys.stdout.write(f'{NUL}prompt{US}layout to {action}{NL}')
-
-    cursexp = wm(f'dump {tag}').strip()
-    oldlays = herbie.layouts.read_store(wm, tag)
-    choices, lays = herbie.layouts.rofi(wm, tag, oldlays, cursexp)
-
-    meths = {
-        "save": lambda lay : herbie.layouts.add_store(wm, lay, tag),
-        "drop": lambda lay : herbie.layouts.del_store(wm, lay, tag),
-        "load": lambda lay : wm(f'load {tag} "{lay.sexp}"'),
-    }
-    meth = meths[action]
-
-    if args:                    # got selection
-        for arg in args:
-            try:
-                lay = lays[arg]
-            except KeyError:
-                lay = herbie.layouts.Layout(arg, cursexp)
-            meth(lay)
-        return
-
-    # if no args, print rofi items
-    for choice in choices:
-        print(choice)
-
-
-@cli.command("load")
-@click.option("-t", "--tag", type=str, default=None,
-              help="Name the tag of layout to save, def is current tag")
-@click.pass_context
-def load(ctx, tag):
-    '''
-    Load a saved layout of the tag.
-    '''
-    wm = ctx.obj['wm']
-    ui = ctx.obj['ui']
-    tag = tag or wm.focused_tag
-
-    cursexp = wm(f'dump {tag}').strip()
-    oldlays = herbie.layouts.read_store(wm, tag)
-    choices = herbie.layouts.rofi(wm, tag, oldlays, cursexp)
-
-    ui.width = -50
-    ui.retform = 'i'            # index
-    got = ui.choose(choices, "Load layout",
-                    "Pick layout to load")
-    if got is None:
-        return
-    try:
-        got = int(got)
-    except ValueError:
-        return
-    lay = oldlays[got]
-    wm(f'load {tag} "{lay.sexp}"')
-
-@cli.command("save")
-@click.option("-t", "--tag", type=str, default=None,
-              help="Name the tag of layout to save, def is current tag")
-@click.option("-p", "--purge", is_flag=True, default=False,
-              help="Purge prior saves before adding the current layout")
-@click.pass_context
-def save(ctx, tag, purge):
-    '''
-    Add the current layout to those saved on the tag.
-    '''
-    wm = ctx.obj['wm']
-    ui = ctx.obj['ui']
-    tag = tag or wm.focused_tag
-
-    if purge:
-        herbie.layouts.purge(wm, tag)
-
-    cursexp = wm(f'dump {tag}').strip()
-    oldlays = herbie.layouts.read_store(wm, tag)
-    choices = herbie.layouts.rofi(wm, tag, oldlays, cursexp)
-
-    ui.width = -50
-    got = ui.choose(choices, "Save layout to",
-                    "Give a new name or overwrite existing")
-    if not got:
-        return
-    got = got.strip().split()[0]
-    herbie.layouts.add_store(wm, herbie.layouts.Layout(got, cursexp), tag)
-
-
-
-@cli.command("svgdump")
+@cli.command("svgicon")
 @click.option("-t", "--tag", type=str, default=None,
               help="Name the tag of layout to dump, def is current tag")
-@click.option("-o", "--output", type=str, default=None,
-              help="Output svg file name")
+@click.option("-n", "--name", type=str, default=None,
+              help="Icon name, no extension")
+@click.option("-W", "--width", type=int, default=100,
+              help="Icon width in pixels")
+@click.option("-H", "--height", type=int, default=100,
+              help="Icon height in pixels")
 @click.pass_context
-def svgdump(ctx, tag, output):
+def svgicon(ctx, tag, name, width, height):
+    '''
+    Render a tag as an SVG.
+    '''
 
     wm = ctx.obj['wm']
     tag = tag or wm.focused_tag
     tree = make_tree(wm(f'dump {tag}'))
     # fixme: auto determine width/height
-    herbie.svg.make_icon(output, tree)
+    if name is None:
+        name = f'herbie-{tag}-{width}x{height}'
+    fname = herbie.svg.make_icon(name, tree, width, height)
+    print(fname)
 
 
 @cli.command("tags")
@@ -289,35 +167,44 @@ def svgdump(ctx, tag, output):
 @click.pass_context
 def tags(ctx, order):
     '''
-    Print tags one line at a time in order
+    Print tags one line at a time in order.
     '''
     tags = ctx.obj['wm'].current_tags(order)
     ctx.obj['ui'].echo('\n'.join(tags))
+
 
 @cli.command("task")
 @click.option("-t", "--tag", type=str, default=None,
               help="Name the tag to use for task instead of using task name")
 @click.argument("task")
-def task(tag, task):
+@click.pass_context
+def task(ctx, tag, task):
     '''
-    Fill screen with task layout
+    Produce a predefined task layout.
     '''
-    # fixme: move to some real config system
-    import herbie.tasks
-    meth = getattr(herbie.tasks, 'task_'+task)
-    tree = meth()
-    if not tag:
-        tag = task
-    toscreen(tag, tree)
+    herbie.tasks.toscreen(ctx.obj['wm'], ctx.obj['cfg'], task, tag)
+
+
+@cli.command("tasks")
+@click.pass_context
+def tasks(ctx):
+    '''
+    List tasks available in the configuration.
+    '''
+    cfg = ctx.obj['cfg']
+    lines = herbie.tasks.available(cfg)
+    ctx.obj['ui'].echo(lines, "herbie tasks")
+
 
 @cli.command("itask")
 @click.pass_context
 def itask(ctx):
     '''
-    Interactively figure how to fill screen with task layout
+    Interactively figure how to fill screen with task layout.
     '''
     wm = ctx.obj['wm']
-    tasks = available("task")
+    cfg = ctx.obj['cfg']
+    tasks = herbie.tasks.available(cfg)
     ui = ctx.obj['ui']
     ui.monitor = "focused"
     ui.width = -20
@@ -330,19 +217,8 @@ def itask(ctx):
     if len(got) > 1:
         tag = got[1]
         
-    tree = get_task(task)
-    toscreen(wm, tag, tree)
+    herbie.tasks.toscreen(wm, cfg, task, tag)
 
-
-
-@cli.command("tasks")
-@click.pass_context
-def tasks(ctx):
-    '''
-    List known tasks
-    '''
-    # fixme: move to some real config system
-    ctx.obj['ui'].echo(available("task"))
 
 @cli.command("fini")
 @click.option("-g", "--goto", type=str, default=None,
@@ -350,15 +226,16 @@ def tasks(ctx):
 @click.argument("name")
 def fini(goto, name):
     '''
-    Finish a task screen by closing all windows and removing the tag
+    Finish a task screen by closing all windows and removing the tag.
     '''
     closescreen(name, goto)
+    
 
 @cli.command("ifini")
 @click.pass_context
 def ifini(ctx):
     '''
-    Interactively finish a task screen by closing all windows and removing the tag
+    Interactively finish a task screen by closing all windows and removing the tag.
     '''
     wm = ctx.obj['wm']
     tags = wm.current_tags()
@@ -378,33 +255,23 @@ def ifini(ctx):
 @click.pass_context
 def loop(ctx, looper):
     '''
-    Run a looper
+    Run a looper.
     '''
     wm = ctx.obj['wm']
     import herbie.loops
     meth = getattr(herbie.loops, 'loop_'+looper)
     meth(wm)
+
     
 @cli.command("loops")
 @click.pass_context
 def loops(ctx):
     '''
-    List known loopers
+    List known loopers.
     '''
     ctx.obj['ui'].echo(available("loop"))
 
     
-
-# @cli.command("switch")
-# @click.pass_context
-# def switch(ctx):
-#     '''
-#     Switch windows.
-#     '''
-#     wm = ctx.obj['wm']
-#     switch_windows(wm)
-
-
 
 def main():
     cli(obj={})
