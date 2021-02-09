@@ -35,7 +35,6 @@ def cli(ctx, hc, ui, config):
     ctx.obj["ui"] = uimod.UI()
     ctx.obj["wm"] = WM(hc)
     cfg = configparser.ConfigParser()
-    print(config)
     cfg.read(config)
     ctx.obj["cfg"] = cfg 
 

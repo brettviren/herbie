@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-02-05 Fri 15:01 -->
+<!-- 2021-02-08 Mon 22:03 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>🌿 herbie 🌿</title>
@@ -256,49 +256,52 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgfbe1ac1">Intro</a>
+<li><a href="#org8eb98a9">Intro</a>
 <ul>
-<li><a href="#org0051e9d">Documentation</a></li>
-<li><a href="#org9e0b484">Usage</a></li>
-<li><a href="#org5245900">Concepts</a></li>
+<li><a href="#orge8b5b92">Documentation</a></li>
+<li><a href="#org7f23655">Usage</a></li>
+<li><a href="#org130bcea">Concepts</a></li>
 </ul>
 </li>
-<li><a href="#orge3ac2f0">Tasks</a>
+<li><a href="#orgefdb198">Tasks</a>
 <ul>
-<li><a href="#orge4a3398">Assure a task</a></li>
-<li><a href="#org3572bda">Finishing a task</a></li>
-<li><a href="#org3cde07d">Defining tasks</a></li>
-<li><a href="#org062963c">Interactivity</a></li>
-<li><a href="#orge23ac03">Calling from herbstluftwm</a></li>
+<li><a href="#orgd7fae06">Assure a task</a></li>
+<li><a href="#org364f172">Finishing a task</a></li>
+<li><a href="#orga282d96">Defining tasks</a></li>
+<li><a href="#orgf12ec9f">Interactivity</a></li>
+<li><a href="#orga51010e">Calling from herbstluftwm</a></li>
 </ul>
 </li>
-<li><a href="#org2c30b82">Loops</a>
+<li><a href="#org25a50c1">Loops</a>
 <ul>
-<li><a href="#org37dfb0c">Available loops</a></li>
-<li><a href="#org06c8a5b">Running loops</a></li>
+<li><a href="#org1cfa6cd">Available loops</a></li>
+<li><a href="#org91dd0a2">Running loops</a></li>
 </ul>
 </li>
-<li><a href="#orgd2a3fa3">Commands</a>
+<li><a href="#org7f17ee9">Modi</a></li>
+<li><a href="#org89957dd">Layouts</a></li>
+<li><a href="#orge75bfc0">Commands</a>
 <ul>
-<li><a href="#org6372a9a"><code>save</code> and <code>load</code></a></li>
-<li><a href="#org9765545">The "w" commands</a></li>
+<li><a href="#org45345c4"><code>svgicon</code></a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgfbe1ac1" class="outline-2">
-<h2 id="orgfbe1ac1">Intro</h2>
-<div class="outline-text-2" id="text-orgfbe1ac1">
+<div id="outline-container-org8eb98a9" class="outline-2">
+<h2 id="org8eb98a9">Intro</h2>
+<div class="outline-text-2" id="text-org8eb98a9">
 <p>
 <code>herbie</code> is helper for managing a <a href="https://herbstluftwm.org/">herbstluftwm</a> interactive environment.
+Interactivity is provide through keybindings and <a href="https://github.com/davatorium/rofi">rofi</a> and the
+<a href="https://github.com/miphreal/python-rofi-menu">rofi-menu</a> Python interface.
 </p>
 </div>
 
-<div id="outline-container-org0051e9d" class="outline-3">
-<h3 id="org0051e9d">Documentation</h3>
-<div class="outline-text-3" id="text-org0051e9d">
+<div id="outline-container-orge8b5b92" class="outline-3">
+<h3 id="orge8b5b92">Documentation</h3>
+<div class="outline-text-3" id="text-orge8b5b92">
 <p>
 You are reading it.  This file is it.  You can see it rendered by
 <a href="https://github.com/brettviren/herbie/blob/master/README.org">github</a> or more beautifully by <a href="https://brettviren.github.io/herbie/">Emacs</a> (with the help of <a href="https://github.com/fniessen/org-html-themes">fniessen's ReadTheOrg</a>)
@@ -306,9 +309,9 @@ You are reading it.  This file is it.  You can see it rendered by
 </div>
 </div>
 
-<div id="outline-container-org9e0b484" class="outline-3">
-<h3 id="org9e0b484">Usage</h3>
-<div class="outline-text-3" id="text-org9e0b484">
+<div id="outline-container-org7f23655" class="outline-3">
+<h3 id="org7f23655">Usage</h3>
+<div class="outline-text-3" id="text-org7f23655">
 <p>
 The <code>herbie</code> package provides a <code>herbie</code> command line program.  Run it to
 print a brief help message:
@@ -320,24 +323,24 @@ Usage: herbie [OPTIONS] COMMAND [ARGS]...
 Options:
   -h, --hc TEXT        Set the herbstclient executable name
   -u, --ui [term|gui]  Set user interface
+  -c, --config PATH    Set configuration file
   --help               Show this message and exit.
 
 Commands:
-  fini     Finish a task screen by closing all windows and removing the tag
+  fini     Finish a task screen by closing all windows and removing the tag.
   ifini    Interactively finish a task screen by closing all windows and...
-  itask    Interactively figure how to fill screen with task layout
-  load     Load a saved layout of the tag.
-  loop     Run a looper
-  loops    List known loopers
-  save     Add the current layout to those saved on the tag.
-  svgdump
-  tags     Print tags one line at a time in order
-  task     Fill screen with task layout
-  tasks    List known tasks
-  version  Print the version
-  waction  Select and perform an action on a window
-  wbring   Bring and focus a window on current tab
-  wselect  Select and focus a window
+  itask    Interactively figure how to fill screen with task layout.
+  layout   A rofi modi for loading, saving, dropping layouts.
+  loop     Run a looper.
+  loops    List known loopers.
+  svgicon  Render a tag as an SVG.
+  tags     Print tags one line at a time in order.
+  task     Produce a predefined task layout.
+  tasks    List tasks available in the configuration.
+  version  Print the version.
+  waction  Select and perform an action on a window.
+  wbring   Bring a window to a tag.
+  wselect  Select a window for focus.
 </pre>
 
 <p>
@@ -354,23 +357,30 @@ As long as this version is held at <code>0.0.0</code> expect breaking changes.
 </div>
 </div>
 
-<div id="outline-container-org5245900" class="outline-3">
-<h3 id="org5245900">Concepts</h3>
-<div class="outline-text-3" id="text-org5245900">
+<div id="outline-container-org130bcea" class="outline-3">
+<h3 id="org130bcea">Concepts</h3>
+<div class="outline-text-3" id="text-org130bcea">
 <p>
 <code>herbie</code> functionality is organized into these concepts:
 </p>
 
 <dl class="org-dl">
 <dt>tasks</dt><dd>these are things you do, not herbie.  herbie will help you
-do your tasks by making it easy to set up and tear a task-specific
-tag.</dd>
+do your tasks by making it easy to set up and tear down a
+task-specific tag.</dd>
+
+<dt>layouts</dt><dd>similar to tasks, they are like a "save game" for
+herbstluftwm.  They let you capture any number of snapshots of your
+tags' layouts so that you can return to any of them later.</dd>
+
+<dt>modi</dt><dd>some interaction with <code>herbie</code> is to use it as a <code>rofi</code> <i>modi</i>,
+possibly with several together as a <code>rofi</code> <i>combi</i>.</dd>
+
+<dt>commands</dt><dd>these are one-shot manipulations.</dd>
 
 <dt>loops</dt><dd>herbie can provide for ongoing behavior by issuing commands
-in response to herbstluftwm events aka hooks.</dd>
-
-<dt>commands</dt><dd>these are on-shot manipulations, some using <a href="https://github.com/davatorium/rofi">rofi</a> if
-interactive user choice is needed.</dd>
+in response to herbstluftwm events aka hooks.  Some concept
+implementations require some loops to be running.</dd>
 </dl>
 
 <p>
@@ -381,14 +391,14 @@ features.
 </div>
 </div>
 
-<div id="outline-container-orge3ac2f0" class="outline-2">
-<h2 id="orge3ac2f0">Tasks</h2>
-<div class="outline-text-2" id="text-orge3ac2f0">
+<div id="outline-container-orgefdb198" class="outline-2">
+<h2 id="orgefdb198">Tasks</h2>
+<div class="outline-text-2" id="text-orgefdb198">
 <p>
 <code>herbie</code>'s concept of a "task" is not something <code>herbie</code> does but
-something you do.  A task a herbstluftwm "tag" holding a certain
-pre-defined layout of frames which is populated with specific windows.
-Here is the result of a task called <code>dev</code>.
+something <b>you</b> do.  A task a herbstluftwm "tag" holding a certain
+pre-defined layout of frames which are populated with specific
+application windows.  Here is the result of a task called <code>dev</code>.
 </p>
 
 
@@ -399,51 +409,36 @@ Here is the result of a task called <code>dev</code>.
 
 <p>
 The number of frames, their ratios and orientation and their window
-contents are all predetermined.  With a single command one can remake
-this layout and one can have multiple tags that use the layout.
+contents are all determined by user-provided configuration.  With a
+single command one can remake this layout and one can have multiple
+tags that use the layout.
 </p>
 </div>
 
-<div id="outline-container-orge4a3398" class="outline-3">
-<h3 id="orge4a3398">Assure a task</h3>
-<div class="outline-text-3" id="text-orge4a3398">
+<div id="outline-container-orgd7fae06" class="outline-3">
+<h3 id="orgd7fae06">Assure a task</h3>
+<div class="outline-text-3" id="text-orgd7fae06">
 <p>
 Running:
 </p>
 
 <pre class="example">
-$ herbie task dev
+$ herbie task dev        (1)
+$ herbie task dev mydev  (2)
+$ herbie task dev mydev  (3)
 </pre>
 
-<p>
-produces a tag called <code>dev</code> with a certain layout of frames populated
-with application windows based on the task configuration of the same
-name.
-</p>
-
-<div class="note">
-<p>
-The <code>herbie task</code> command is <i>incrementally idempotent</i>.  You may run it
-again and expect no change.  If you have switched to another tag,
-rerunning will merely bring you to the task tag.  
-</p>
-
-<p>
-If you have modified the layout of the task tag, rerunning will
-attempt to restore the layout and window content.  In doing so, <code>herbie</code>
-will run an associated command if it finds an empty frame.  If a frame
-has one or more windows, regardless of what application they are from,
-<code>herbie</code> will ignore it.  Thus if you have, say, added windows in a
-frame, do not expect a subsequent <code>herbie task</code> to close them.
-</p>
-
-</div>
+<ol class="org-ol">
+<li>Produce a tag called <code>dev</code> populated with a task of the same name.</li>
+<li>As above but populate the task <code>dev</code> to the tag <code>mydev</code></li>
+<li>Rerun and any changes to the layout or closed applications will be restored.</li>
+</ol>
 </div>
 </div>
 
-<div id="outline-container-org3572bda" class="outline-3">
-<h3 id="org3572bda">Finishing a task</h3>
-<div class="outline-text-3" id="text-org3572bda">
+<div id="outline-container-org364f172" class="outline-3">
+<h3 id="org364f172">Finishing a task</h3>
+<div class="outline-text-3" id="text-org364f172">
 <p>
 When <code>herbie</code> is asked to "finish" a task, all windows are closed and the
 tag is removed (merged to another).
@@ -466,30 +461,60 @@ $ herbie fini -g irc dev
 </div>
 </div>
 
-<div id="outline-container-org3cde07d" class="outline-3">
-<h3 id="org3cde07d">Defining tasks</h3>
-<div class="outline-text-3" id="text-org3cde07d">
+<div id="outline-container-orga282d96" class="outline-3">
+<h3 id="orga282d96">Defining tasks</h3>
+<div class="outline-text-3" id="text-orga282d96">
 <p>
-Tasks are defined as a tree analogous to what you see from a
-<code>herbstclient dump</code>.  Each leaf describing a frame with windows has a
-command to run to provide the window and a set of X11 properties to
-match the window.
+Tasks are defined as a tree data structure using <a href="https://en.wikipedia.org/wiki/S-expression">sexp</a> syntax in an
+almost exactly identical form as one may see from the command
+<code>herbstclient dump</code>.  The difference is that any place where you might
+see a window ID (<code>0xdeadbeaf</code>) you may place zero or more herbie <i>window
+names</i> with which herbie may associate a <i>command</i> to supply the window
+and a number of attributes to form an herbstluftwm <i>rule</i>.
 </p>
 
-<div class="warning">
 <p>
-Currently <code>herbie</code> lacks a task definition language and instead tasks
-are hard-wired in the <code>herbie.tasks</code> Python module.  <b>This will change</b> so
-don't get used to it.
+Tasks and windows are provided in a herbie configuration file.  An
+example is provided in <a href="example.herbierc">example.herbierc</a>.  The <code>[tasks]</code> section
+holds a list of available tasks.  Again this is <b>not quite the output</b>
+of <code>herbstclient dump</code>:
 </p>
 
-</div>
+<pre class="example">
+dweb = (clients window:firefox)
+rss = (split horizontal:0.75:1
+        (clients window:firefox)
+        (split vertical:0.50:0
+          (clients window:liferea)
+          (clients )))
+</pre>
+
+<p>
+A window reference is satisfied by a section named like <code>[window
+&lt;name&gt;]</code>.  for example, the reference windows in the above example
+tasks may be provided like:
+</p>
+
+<pre class="example">
+[window firefox]
+title = Mozilla Firefox
+command = firefox -P default-esr
+
+[window liferea]
+class = Liferea
+command = liferea
+</pre>
+
+<p>
+In addition to <code>command</code> you may provide any <i>property</i> supported by
+herbstluftwm in forming the <i>condition</i> of a <i>rule</i>
+</p>
 </div>
 </div>
 
-<div id="outline-container-org062963c" class="outline-3">
-<h3 id="org062963c">Interactivity</h3>
-<div class="outline-text-3" id="text-org062963c">
+<div id="outline-container-orgf12ec9f" class="outline-3">
+<h3 id="orgf12ec9f">Interactivity</h3>
+<div class="outline-text-3" id="text-orgf12ec9f">
 <p>
 <code>herbie</code> is user-interactive.  The default UI is a GUI using <a href="https://github.com/davatorium/rofi">rofi</a> and
 <code>libnotify</code>.  An alternative UI uses the terminal.  To activate them,
@@ -500,6 +525,15 @@ add the global command line argument <code>-u</code> like in:
 $ herbie tasks          # use default GUI
 $ herbie -u term tasks  # use terminal
 </pre>
+
+<div class="note">
+<p>
+It is intended to transition from having <code>herbie</code> explicitly execute
+<code>rofi</code> to having <code>herbie</code> act as a <code>rofi</code> <i>modi</i>.  As of now there is a mix of
+both interfaces.  See the section <a href="#org7f17ee9">Modi</a> below.
+</p>
+
+</div>
 
 <p>
 Some <code>herbie</code> commands which take arguments have fully user-interactive
@@ -560,9 +594,9 @@ the one to be finalize provides our landing spot.
 </div>
 </div>
 
-<div id="outline-container-orge23ac03" class="outline-3">
-<h3 id="orge23ac03">Calling from herbstluftwm</h3>
-<div class="outline-text-3" id="text-orge23ac03">
+<div id="outline-container-orga51010e" class="outline-3">
+<h3 id="orga51010e">Calling from herbstluftwm</h3>
+<div class="outline-text-3" id="text-orga51010e">
 <p>
 In your <code>autostart</code> you may have some keybindings to run <code>herbie-dmenu</code>
 like:
@@ -577,9 +611,9 @@ hc keybind $Mod-Shift-i spawn herbie ifini
 </div>
 
 
-<div id="outline-container-org2c30b82" class="outline-2">
-<h2 id="org2c30b82">Loops</h2>
-<div class="outline-text-2" id="text-org2c30b82">
+<div id="outline-container-org25a50c1" class="outline-2">
+<h2 id="org25a50c1">Loops</h2>
+<div class="outline-text-2" id="text-org25a50c1">
 <p>
 A herbie loop is a long-running function that responds to the events
 emitted by herbstluftwm.  Like "tasks" describe above one runs a loop
@@ -587,9 +621,9 @@ by naming it.
 </p>
 </div>
 
-<div id="outline-container-org37dfb0c" class="outline-3">
-<h3 id="org37dfb0c">Available loops</h3>
-<div class="outline-text-3" id="text-org37dfb0c">
+<div id="outline-container-org1cfa6cd" class="outline-3">
+<h3 id="org1cfa6cd">Available loops</h3>
+<div class="outline-text-3" id="text-org1cfa6cd">
 <p>
 The available loops are printed with:
 </p>
@@ -608,15 +642,17 @@ switch
 
 <dl class="org-dl">
 <dt>dump</dt><dd>like <code>herbstclient --idle</code></dd>
-<dt>stamp</dt><dd>add a <code>my_focus_time</code> to each client holding a time stamp of last focus</dd>
+<dt>stamp</dt><dd>add a <code>my_focus_time</code> to each client and tag holding a time
+stamp of last focus.  Other parts of <code>herbie</code> relie on this running
+for ordering.</dd>
 <dt>switch</dt><dd>attempt "Sawfish-like" window switching, it requires <b>stamp</b>.</dd>
 </dl>
 </div>
 </div>
 
-<div id="outline-container-org06c8a5b" class="outline-3">
-<h3 id="org06c8a5b">Running loops</h3>
-<div class="outline-text-3" id="text-org06c8a5b">
+<div id="outline-container-org91dd0a2" class="outline-3">
+<h3 id="org91dd0a2">Running loops</h3>
+<div class="outline-text-3" id="text-org91dd0a2">
 <p>
 A herbie loop may be run on the command line and will exit when a
 <code>reload</code> hook event is received from herbstlufwm.  To run herbie loops
@@ -632,83 +668,103 @@ herbie loop switch &amp;
 </div>
 </div>
 
-<div id="outline-container-orgd2a3fa3" class="outline-2">
-<h2 id="orgd2a3fa3">Commands</h2>
-<div class="outline-text-2" id="text-orgd2a3fa3">
+<div id="outline-container-org7f17ee9" class="outline-2">
+<h2 id="org7f17ee9">Modi</h2>
+<div class="outline-text-2" id="text-org7f17ee9">
+<p>
+<code>herbie</code> talks to <code>rofi</code> as a modi.  To summarize, here are some example
+keybindings.
+</p>
+
+<pre class="example">
+hc keybind $Mod-w        spawn herbie waction
+
+hc keybind $Mod-b        spawn rofi -modi "h:herbie wbring" -show h
+hc keybind $Mod-n        spawn rofi -modi "h:herbie wselect" -show h
+hc keybind $Mod-Shift-n  spawn rofi -modi "h:herbie wselect -t all" -show h
+hc keybind $Mod-k        spawn rofi -modi "h:herbie layout -a save" -show h
+hc keybind $Mod-y        spawn rofi -modi "h:herbie layout -a load" -show h 
+hc keybind $Mod-l        spawn rofi -modi "h:herbie layout" -show h
+</pre>
+
+<dl class="org-dl">
+<dt>waction</dt><dd>a window context menu (not yet <i>modi</i>-fied)</dd>
+<dt>wbring</dt><dd>bring a window to the tag</dd>
+<dt>wselect</dt><dd>give focus to a window</dd>
+<dt>layout</dt><dd>operate on layouts, see section below</dd>
+</dl>
+
+<p>
+We may, of course, use <code>rofi</code> <i>combi</i> to combine multiple herbie <i>modi</i>.
+<code>herbie</code> may also offer nested windows such as in the default call of
+<code>herbie layout</code>.  More on layouts next.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org89957dd" class="outline-2">
+<h2 id="org89957dd">Layouts</h2>
+<div class="outline-text-2" id="text-org89957dd">
+<p>
+Frame layouts can be saved to herbstlufwm tags for later loading back
+to the screen.  This allows manual tweaks to be captured and easily
+reapplied or cycled between them.  Layout storage in herbstlufwm is
+transient and will not survive a restart, but does survive a reload.
+Layout can also be explicitly removed from the store.
+</p>
+
+<p>
+When layouts are displayed through <code>rofi</code> an SVG icon is created on the
+fly from the layout tree in order to give you a hint, in addition to
+the name you gave when saving them.  Here is an example <code>rofi</code> page
+showing what is available for loading:
+</p>
+
+
+<div class="figure">
+<p><img src="docs/layouts.png" alt="layouts.png" />
+</p>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orge75bfc0" class="outline-2">
+<h2 id="orge75bfc0">Commands</h2>
+<div class="outline-text-2" id="text-orge75bfc0">
 <p>
 What remains are simply commands.  
 </p>
 </div>
 
-<div id="outline-container-org6372a9a" class="outline-3">
-<h3 id="org6372a9a"><code>save</code> and <code>load</code></h3>
-<div class="outline-text-3" id="text-org6372a9a">
+<div id="outline-container-org45345c4" class="outline-3">
+<h3 id="org45345c4"><code>svgicon</code></h3>
+<div class="outline-text-3" id="text-org45345c4">
 <p>
-<code>herbie</code> can save and load frame/window layouts.  A <code>herbie save</code> will
-store the result of <code>herbstclient dump</code> for the current layout to the
-current tag.  And a <code>herbie load</code> can restore it.  A layout is stored by
-name for later recall and <code>herbie</code> uses <code>rofi</code> to prompt for a new layout
-name or reuse an old layout name.  For example:
+The <code>svgicon</code> command is not particularly meant to be used
+interactively.  It simply creates an icon representing a tag.
 </p>
+
+<pre class="example">
+$ herbie svgicon
+/home/bv/.icons/herbie-dev-100x100.svg
+# display ~/.icons/herbie-dev-100x100.svg
+</pre>
 
 
 <div class="figure">
-<p><img src="loadsave.png" alt="loadsave.png" />
+<p><object type="image/svg+xml" data="docs/herbie-dev-100x100.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
 </p>
 </div>
-
-
-<p>
-This shows four layouts which have been saved.  Layout names colored
-in green (<code>lay4</code>) indicate they match the current layout while those in
-red differ.  The icon represents the actual frames corresponding to
-the stored layouts.  Selecting a red layout will then readjust the
-current frames to match.
-</p>
-
-<p>
-Example bindings
-</p>
-
-<pre class="example">
-# Mnemonic: Emacs's k-kill / y-yank
-hc keybind $Mod-k spawn herbie save
-hc keybind $Mod-y spawn herbie load
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org9765545" class="outline-3">
-<h3 id="org9765545">The "w" commands</h3>
-<div class="outline-text-3" id="text-org9765545">
-<p>
-Several command relate to windows and are reimplementations of
-"classic" herbstlufwm scripts in <code>herbie</code> just to keep them together.
-</p>
-
-<dl class="org-dl">
-<dt>waction</dt><dd>a rofi "context" menu attached to the current window</dd>
-<dt>wbring</dt><dd>bring some window from another tag to the current one</dd>
-<dt>wselect</dt><dd>pick a window on current tag or all tags and make it focused, order choices by most recently to least recently used with current focus last</dd>
-</dl>
-
-<p>
-Example bindings
-</p>
-
-<pre class="example">
-hc keybind $Mod-b        spawn herbie wbring
-hc keybind $Mod-n        spawn herbie wselect
-hc keybind $Mod-Shift-n  spawn herbie wselect -t all
-hc keybind $Mod-w        spawn herbie waction
-</pre>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: BV</p>
-<p class="date">Created: 2021-02-05 Fri 15:01</p>
+<p class="date">Created: 2021-02-08 Mon 22:03</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

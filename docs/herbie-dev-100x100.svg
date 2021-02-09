@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="100"
+   height="100"
+   id="svg11300"
+   version="1.0"
+   viewBox="0 0 100 100">
+    
+<rect fill='white' stroke='black' stroke-width='1px' width='100' height='100' y='0' x='0' ry='0' rx='0' />
+<line stroke='black' stroke-width='10' x1='50.0' y1='0' x2='50.0' y2='100' />
+<line stroke='black' stroke-width='10' x1='0' y1='0.0' x2='50.0' y2='0.0' />
+</svg>

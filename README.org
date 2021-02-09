@@ -7,6 +7,8 @@
 * Intro
 
 ~herbie~ is helper for managing a [[https://herbstluftwm.org/][herbstluftwm]] interactive environment.
+Interactivity is provide through keybindings and [[https://github.com/davatorium/rofi][rofi]] and the
+[[https://github.com/miphreal/python-rofi-menu][rofi-menu]] Python interface.
 
 ** Documentation
 
@@ -29,24 +31,24 @@ Usage: herbie [OPTIONS] COMMAND [ARGS]...
 Options:
   -h, --hc TEXT        Set the herbstclient executable name
   -u, --ui [term|gui]  Set user interface
+  -c, --config PATH    Set configuration file
   --help               Show this message and exit.
 
 Commands:
-  fini     Finish a task screen by closing all windows and removing the tag
+  fini     Finish a task screen by closing all windows and removing the tag.
   ifini    Interactively finish a task screen by closing all windows and...
-  itask    Interactively figure how to fill screen with task layout
-  load     Load a saved layout of the tag.
-  loop     Run a looper
-  loops    List known loopers
-  save     Add the current layout to those saved on the tag.
-  svgdump
-  tags     Print tags one line at a time in order
-  task     Fill screen with task layout
-  tasks    List known tasks
-  version  Print the version
-  waction  Select and perform an action on a window
-  wbring   Bring and focus a window on current tab
-  wselect  Select and focus a window
+  itask    Interactively figure how to fill screen with task layout.
+  layout   A rofi modi for loading, saving, dropping layouts.
+  loop     Run a looper.
+  loops    List known loopers.
+  svgicon  Render a tag as an SVG.
+  tags     Print tags one line at a time in order.
+  task     Produce a predefined task layout.
+  tasks    List tasks available in the configuration.
+  version  Print the version.
+  waction  Select and perform an action on a window.
+  wbring   Bring a window to a tag.
+  wselect  Select a window for focus.
 #+end_example
 
 The above is current as of ~herbie version~
@@ -67,14 +69,21 @@ As long as this version is held at ~0.0.0~ expect breaking changes.
 ~herbie~ functionality is organized into these concepts:
 
 - tasks :: these are things you do, not herbie.  herbie will help you
-  do your tasks by making it easy to set up and tear a task-specific
-  tag.
+  do your tasks by making it easy to set up and tear down a
+  task-specific tag.
+
+- layouts :: similar to tasks, they are like a "save game" for
+  herbstluftwm.  They let you capture any number of snapshots of your
+  tags' layouts so that you can return to any of them later.
+
+- modi :: some interaction with ~herbie~ is to use it as a ~rofi~ /modi/,
+  possibly with several together as a ~rofi~ /combi/.
+
+- commands :: these are one-shot manipulations.
 
 - loops :: herbie can provide for ongoing behavior by issuing commands
-  in response to herbstluftwm events aka hooks.
-
-- commands :: these are on-shot manipulations, some using [[https://github.com/davatorium/rofi][rofi]] if
-  interactive user choice is needed.
+  in response to herbstluftwm events aka hooks.  Some concept
+  implementations require some loops to be running.
 
 The remaining sections describe each concept and how to use its
 features.
@@ -82,40 +91,30 @@ features.
 * Tasks
 
 ~herbie~'s concept of a "task" is not something ~herbie~ does but
-something you do.  A task a herbstluftwm "tag" holding a certain
-pre-defined layout of frames which is populated with specific windows.
-Here is the result of a task called ~dev~.
+something *you* do.  A task a herbstluftwm "tag" holding a certain
+pre-defined layout of frames which are populated with specific
+application windows.  Here is the result of a task called ~dev~.
 
 [[file:docs/ss.png][file:docs/ss-thumb.png]]
 
 The number of frames, their ratios and orientation and their window
-contents are all predetermined.  With a single command one can remake
-this layout and one can have multiple tags that use the layout.
+contents are all determined by user-provided configuration.  With a
+single command one can remake this layout and one can have multiple
+tags that use the layout.
 
 ** Assure a task
 
 Running:
 
 #+begin_example
-  $ herbie task dev
+  $ herbie task dev        (1)
+  $ herbie task dev mydev  (2)
+  $ herbie task dev mydev  (3)
 #+end_example
 
-produces a tag called ~dev~ with a certain layout of frames populated
-with application windows based on the task configuration of the same
-name.
-
-#+begin_note
-The ~herbie task~ command is /incrementally idempotent/.  You may run it
-again and expect no change.  If you have switched to another tag,
-rerunning will merely bring you to the task tag.  
-
-If you have modified the layout of the task tag, rerunning will
-attempt to restore the layout and window content.  In doing so, ~herbie~
-will run an associated command if it finds an empty frame.  If a frame
-has one or more windows, regardless of what application they are from,
-~herbie~ will ignore it.  Thus if you have, say, added windows in a
-frame, do not expect a subsequent ~herbie task~ to close them.
-#+end_note
+1. Produce a tag called ~dev~ populated with a task of the same name.
+2. As above but populate the task ~dev~ to the tag ~mydev~
+3. Rerun and any changes to the layout or closed applications will be restored.
 
 ** Finishing a task
 
@@ -137,16 +136,43 @@ important matters.
 
 ** Defining tasks
 
-Tasks are defined as a tree analogous to what you see from a
-~herbstclient dump~.  Each leaf describing a frame with windows has a
-command to run to provide the window and a set of X11 properties to
-match the window.
+Tasks are defined as a tree data structure using [[https://en.wikipedia.org/wiki/S-expression][sexp]] syntax in an
+almost exactly identical form as one may see from the command
+~herbstclient dump~.  The difference is that any place where you might
+see a window ID (~0xdeadbeaf~) you may place zero or more herbie /window
+names/ with which herbie may associate a /command/ to supply the window
+and a number of attributes to form an herbstluftwm /rule/.
 
-#+begin_warning
-Currently ~herbie~ lacks a task definition language and instead tasks
-are hard-wired in the ~herbie.tasks~ Python module.  *This will change* so
-don't get used to it.
-#+end_warning
+Tasks and windows are provided in a herbie configuration file.  An
+example is provided in [[file:example.herbierc]].  The ~[tasks]~ section
+holds a list of available tasks.  Again this is *not quite the output*
+of ~herbstclient dump~:
+
+#+begin_example
+dweb = (clients window:firefox)
+rss = (split horizontal:0.75:1
+        (clients window:firefox)
+        (split vertical:0.50:0
+          (clients window:liferea)
+          (clients )))
+#+end_example
+
+A window reference is satisfied by a section named like ~[window
+<name>]~.  for example, the reference windows in the above example
+tasks may be provided like:
+
+#+begin_example
+[window firefox]
+title = Mozilla Firefox
+command = firefox -P default-esr
+
+[window liferea]
+class = Liferea
+command = liferea
+#+end_example
+
+In addition to ~command~ you may provide any /property/ supported by
+herbstluftwm in forming the /condition/ of a /rule/
 
 ** Interactivity
 
@@ -158,6 +184,12 @@ add the global command line argument ~-u~ like in:
   $ herbie tasks          # use default GUI
   $ herbie -u term tasks  # use terminal
 #+end_example
+
+#+begin_note
+It is intended to transition from having ~herbie~ explicitly execute
+~rofi~ to having ~herbie~ act as a ~rofi~ /modi/.  As of now there is a mix of
+both interfaces.  See the section [[Modi]] below.
+#+end_note
 
 Some ~herbie~ commands which take arguments have fully user-interactive
 versions of the same name but with the prefix "~i~".  For example:
@@ -237,7 +269,9 @@ switch
 #+end_example
 
 - dump :: like ~herbstclient --idle~
-- stamp :: add a ~my_focus_time~ to each client holding a time stamp of last focus
+- stamp :: add a ~my_focus_time~ to each client and tag holding a time
+  stamp of last focus.  Other parts of ~herbie~ relie on this running
+  for ordering.
 - switch :: attempt "Sawfish-like" window switching, it requires *stamp*.
 
 ** Running loops
@@ -252,49 +286,62 @@ herbie loop stamp &
 herbie loop switch &
 #+end_example
 
+* Modi
+
+~herbie~ talks to ~rofi~ as a modi.  To summarize, here are some example
+keybindings.
+
+#+begin_example
+hc keybind $Mod-w        spawn herbie waction
+
+hc keybind $Mod-b        spawn rofi -modi "h:herbie wbring" -show h
+hc keybind $Mod-n        spawn rofi -modi "h:herbie wselect" -show h
+hc keybind $Mod-Shift-n  spawn rofi -modi "h:herbie wselect -t all" -show h
+hc keybind $Mod-k        spawn rofi -modi "h:herbie layout -a save" -show h
+hc keybind $Mod-y        spawn rofi -modi "h:herbie layout -a load" -show h 
+hc keybind $Mod-l        spawn rofi -modi "h:herbie layout" -show h
+#+end_example
+
+- waction :: a window context menu (not yet /modi/-fied)
+- wbring :: bring a window to the tag
+- wselect :: give focus to a window
+- layout :: operate on layouts, see section below
+
+We may, of course, use ~rofi~ /combi/ to combine multiple herbie /modi/.
+~herbie~ may also offer nested windows such as in the default call of
+~herbie layout~.  More on layouts next.
+
+* Layouts
+
+Frame layouts can be saved to herbstlufwm tags for later loading back
+to the screen.  This allows manual tweaks to be captured and easily
+reapplied or cycled between them.  Layout storage in herbstlufwm is
+transient and will not survive a restart, but does survive a reload.
+Layout can also be explicitly removed from the store.
+
+When layouts are displayed through ~rofi~ an SVG icon is created on the
+fly from the layout tree in order to give you a hint, in addition to
+the name you gave when saving them.  Here is an example ~rofi~ page
+showing what is available for loading:
+
+[[file:docs/layouts.png]]
+
+
+
 * Commands
 
 What remains are simply commands.  
 
-** ~save~ and ~load~
+** ~svgicon~
 
-~herbie~ can save and load frame/window layouts.  A ~herbie save~ will
-store the result of ~herbstclient dump~ for the current layout to the
-current tag.  And a ~herbie load~ can restore it.  A layout is stored by
-name for later recall and ~herbie~ uses ~rofi~ to prompt for a new layout
-name or reuse an old layout name.  For example:
-
-[[file:loadsave.png]]
-
-
-This shows four layouts which have been saved.  Layout names colored
-in green (~lay4~) indicate they match the current layout while those in
-red differ.  The icon represents the actual frames corresponding to
-the stored layouts.  Selecting a red layout will then readjust the
-current frames to match.
-
-Example bindings
+The ~svgicon~ command is not particularly meant to be used
+interactively.  It simply creates an icon representing a tag.
 
 #+begin_example
-  # Mnemonic: Emacs's k-kill / y-yank
-  hc keybind $Mod-k spawn herbie save
-  hc keybind $Mod-y spawn herbie load
+  $ herbie svgicon
+  /home/bv/.icons/herbie-dev-100x100.svg
+  # display ~/.icons/herbie-dev-100x100.svg
 #+end_example
 
-** The "w" commands
+[[file:docs/herbie-dev-100x100.svg]]
 
-Several command relate to windows and are reimplementations of
-"classic" herbstlufwm scripts in ~herbie~ just to keep them together.
-
-- waction :: a rofi "context" menu attached to the current window
-- wbring :: bring some window from another tag to the current one
-- wselect :: pick a window on current tag or all tags and make it focused, order choices by most recently to least recently used with current focus last
-
-Example bindings
-
-#+begin_example
-  hc keybind $Mod-b        spawn herbie wbring
-  hc keybind $Mod-n        spawn herbie wselect
-  hc keybind $Mod-Shift-n  spawn herbie wselect -t all
-  hc keybind $Mod-w        spawn herbie waction
-#+end_example
