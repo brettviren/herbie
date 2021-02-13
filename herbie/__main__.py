@@ -159,6 +159,28 @@ def svgicon(ctx, tag, name, width, height):
     print(fname)
 
 
+@cli.command("totag")
+@click.argument("tag")
+@click.pass_context
+def totag(ctx, tag):
+    '''Make tag active or if already then use previously active tag.
+
+    The tag is assumed to be an index into the tag list if its an
+    integer, else it's assumed to be a tag.
+    '''
+    wm = ctx.obj['wm']
+    tags = wm.current_tags()
+    try:
+        ind = int(tag)
+        nam = tags[ind]
+    except ValueError:
+        ind = tags.index(tag)
+        nam = tag
+    if nam == wm.focused_tag:
+        wm("use_previous")
+    else:
+        wm(f'use_index {ind}')
+
 @cli.command("tags")
 @click.option("-o","--order", default="index",
               type=click.Choice(["index","name"]),
