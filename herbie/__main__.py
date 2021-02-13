@@ -122,11 +122,16 @@ def do_layout(ctx, tag, action, args):
 
     Example commands:
 
-        rofi -modi "l:herbie layout -a load" -show l
-        rofi -modi "s:herbie layout -a save" -show s
-        rofi -modi "d:herbie layout -a drop" -show d
-        rofi -modi "a:herbie layout -a all" -show a 
+    rofi -modi "l:herbie layout -a load" -show l
+
+    rofi -modi "s:herbie layout -a save" -show s
+
+    rofi -modi "d:herbie layout -a drop" -show d
+
+    rofi -modi "a:herbie layout -a all" -show a 
     '''
+    # hide our args except prgram name from rofi_menu
+    sys.argv[1:] = args
     wm = ctx.obj['wm']
     tag = tag or wm.focused_tag
     lm = rofi.layout_menu(wm, action, tag)
