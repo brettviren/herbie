@@ -347,6 +347,32 @@ do
 done
 #+end_example
 
+One caution, the ~herbie totag~ command is rather slow, likely because
+it issues multiple calls to ~herbstclient~.  It runs in about 200ms on
+my laptop which is enough to produce noticeable lag.  The same
+behavior can be achieved about 10x faster by having ~herbstclient~
+perform the logic.  This can be done for example:
+
+#+begin_example
+  tag_keys=( {1..9} 0 )
+  for tind in "${!tag_keys[@]}" 
+  do
+      key="${tag_keys[$tind]}"
+      hc keybind "$Mod-$key" substitute TAG tags.$tind.name \
+        or , \
+          and . compare monitors.focus.tag = TAG \
+              . use_previous \
+           , use TAG  
+  done
+#+end_example
+
+Another take on this comes from IRC (~yushyin~)
+
+#+begin_example
+hc keybind "$Mod-$key" substitute PRE tags.focus.index \
+  chain + use_index "$i" + or , compare tags.focus.index != PRE , use_previous 
+#+end_example
+
 ** ~svgicon~
 
 The ~svgicon~ command is not particularly meant to be used
