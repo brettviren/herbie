@@ -106,6 +106,51 @@ def waction(ctx):
         wm(cmd)
         return
 
+@cli.command("hc")
+@click.argument("args", nargs=-1)
+@click.pass_context
+def hc(ctx, args):
+    '''
+    Pass-through to herbstclient.
+    '''
+    wm = ctx.obj['wm']
+    res = wm(list(args))
+    print(res)
+
+
+
+@cli.command("wswap")
+@click.option("-d","--direction",
+              type=click.Choice(["left","right","above","below"]),
+              help="Specify the direction in which to find a neighbor")
+@click.option("-w","--windows", nargs=2,
+              help="Give two window IDs to swap")
+@click.pass_context
+def wswap(ctx, direction, windows):
+    '''
+    Swap focused window with neighbor in given direction.
+    '''
+    print (windows)
+    wm = ctx.obj['wm']
+    if windows:
+        layout = wm("dump")
+        tag = wm.focused_tag
+        print (layout)
+        # move one out of way
+        layout = layout.replace(windows[0], "TMP")
+        layout = layout.replace(windows[1], windows[0])
+        layout = layout.replace("TMP", windows[1])
+        print(layout)
+        wm(f"load {tag} '{layout}'")
+
+    else:
+        cmd=f"substitute OLDWIN clients.focus.winid chain , focus {direction} , substitute NEWWIN clients.focus.winid spawn herbie wswap --windows OLDWIN NEWWIN"
+        print(cmd)
+        wm(cmd)
+
+
+
+    
 
 @cli.command("layout")
 @click.option("-t", "--tag", type=str, default=None,

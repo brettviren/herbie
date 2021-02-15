@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-02-08 Mon 22:03 -->
+<!-- 2021-02-15 Mon 14:55 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>🌿 herbie 🌿</title>
@@ -256,42 +256,56 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org8eb98a9">Intro</a>
+<li><a href="#org222c78b">Intro</a>
 <ul>
-<li><a href="#orge8b5b92">Documentation</a></li>
-<li><a href="#org7f23655">Usage</a></li>
-<li><a href="#org130bcea">Concepts</a></li>
+<li><a href="#org795d8c1">Documentation</a></li>
+<li><a href="#orgc20ee5b">Usage</a></li>
+<li><a href="#orgecfd408">Concepts</a></li>
 </ul>
 </li>
-<li><a href="#orgefdb198">Tasks</a>
+<li><a href="#orgebf17b3">Tasks</a>
 <ul>
-<li><a href="#orgd7fae06">Assure a task</a></li>
-<li><a href="#org364f172">Finishing a task</a></li>
-<li><a href="#orga282d96">Defining tasks</a></li>
-<li><a href="#orgf12ec9f">Interactivity</a></li>
-<li><a href="#orga51010e">Calling from herbstluftwm</a></li>
+<li><a href="#org2dda348">Assure a task</a></li>
+<li><a href="#org67ce79d">Finishing a task</a></li>
+<li><a href="#org58eac58">Defining tasks</a></li>
+<li><a href="#orgd6aca50">Interactivity</a></li>
+<li><a href="#org7595c11">Calling from herbstluftwm</a></li>
 </ul>
 </li>
-<li><a href="#org25a50c1">Loops</a>
+<li><a href="#orgd036cd2">Loops</a>
 <ul>
-<li><a href="#org1cfa6cd">Available loops</a></li>
-<li><a href="#org91dd0a2">Running loops</a></li>
+<li><a href="#org01d70f6">Available loops</a></li>
+<li><a href="#org717a16c">Running loops</a></li>
 </ul>
 </li>
-<li><a href="#org7f17ee9">Modi</a></li>
-<li><a href="#org89957dd">Layouts</a></li>
-<li><a href="#orge75bfc0">Commands</a>
+<li><a href="#org69b6dc1">Modi</a></li>
+<li><a href="#orgc066d99">Layouts</a></li>
+<li><a href="#org525dda0">Commands</a>
 <ul>
-<li><a href="#org45345c4"><code>svgicon</code></a></li>
+<li><a href="#org845d2fe"><code>totag</code></a></li>
+<li><a href="#org2bf817e"><code>svgicon</code></a></li>
+</ul>
+</li>
+<li><a href="#org3a4c921">Caveats</a>
+<ul>
+<li><a href="#orge2faf1c">Stability</a></li>
+<li><a href="#orgfcf8fab">Speed</a></li>
+</ul>
+</li>
+<li><a href="#org4652ffd">Snippets</a>
+<ul>
+<li><a href="#org0f58202">Swap windows</a></li>
+<li><a href="#orgcae22c1">Float a window and set it to a fixed size</a></li>
+<li><a href="#orgd9a99e0">A faster <code>herbie totag</code></a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org8eb98a9" class="outline-2">
-<h2 id="org8eb98a9">Intro</h2>
-<div class="outline-text-2" id="text-org8eb98a9">
+<div id="outline-container-org222c78b" class="outline-2">
+<h2 id="org222c78b">Intro</h2>
+<div class="outline-text-2" id="text-org222c78b">
 <p>
 <code>herbie</code> is helper for managing a <a href="https://herbstluftwm.org/">herbstluftwm</a> interactive environment.
 Interactivity is provide through keybindings and <a href="https://github.com/davatorium/rofi">rofi</a> and the
@@ -299,9 +313,9 @@ Interactivity is provide through keybindings and <a href="https://github.com/dav
 </p>
 </div>
 
-<div id="outline-container-orge8b5b92" class="outline-3">
-<h3 id="orge8b5b92">Documentation</h3>
-<div class="outline-text-3" id="text-orge8b5b92">
+<div id="outline-container-org795d8c1" class="outline-3">
+<h3 id="org795d8c1">Documentation</h3>
+<div class="outline-text-3" id="text-org795d8c1">
 <p>
 You are reading it.  This file is it.  You can see it rendered by
 <a href="https://github.com/brettviren/herbie/blob/master/README.org">github</a> or more beautifully by <a href="https://brettviren.github.io/herbie/">Emacs</a> (with the help of <a href="https://github.com/fniessen/org-html-themes">fniessen's ReadTheOrg</a>)
@@ -309,9 +323,9 @@ You are reading it.  This file is it.  You can see it rendered by
 </div>
 </div>
 
-<div id="outline-container-org7f23655" class="outline-3">
-<h3 id="org7f23655">Usage</h3>
-<div class="outline-text-3" id="text-org7f23655">
+<div id="outline-container-orgc20ee5b" class="outline-3">
+<h3 id="orgc20ee5b">Usage</h3>
+<div class="outline-text-3" id="text-orgc20ee5b">
 <p>
 The <code>herbie</code> package provides a <code>herbie</code> command line program.  Run it to
 print a brief help message:
@@ -328,6 +342,7 @@ Options:
 
 Commands:
   fini     Finish a task screen by closing all windows and removing the tag.
+  hc       Pass-through to herbstclient.
   ifini    Interactively finish a task screen by closing all windows and...
   itask    Interactively figure how to fill screen with task layout.
   layout   A rofi modi for loading, saving, dropping layouts.
@@ -337,10 +352,12 @@ Commands:
   tags     Print tags one line at a time in order.
   task     Produce a predefined task layout.
   tasks    List tasks available in the configuration.
+  totag    Make tag active or if already then use previously active tag.
   version  Print the version.
   waction  Select and perform an action on a window.
   wbring   Bring a window to a tag.
   wselect  Select a window for focus.
+  wswap    Swap focused window with neighbor in given direction.
 </pre>
 
 <p>
@@ -357,9 +374,9 @@ As long as this version is held at <code>0.0.0</code> expect breaking changes.
 </div>
 </div>
 
-<div id="outline-container-org130bcea" class="outline-3">
-<h3 id="org130bcea">Concepts</h3>
-<div class="outline-text-3" id="text-org130bcea">
+<div id="outline-container-orgecfd408" class="outline-3">
+<h3 id="orgecfd408">Concepts</h3>
+<div class="outline-text-3" id="text-orgecfd408">
 <p>
 <code>herbie</code> functionality is organized into these concepts:
 </p>
@@ -391,9 +408,9 @@ features.
 </div>
 </div>
 
-<div id="outline-container-orgefdb198" class="outline-2">
-<h2 id="orgefdb198">Tasks</h2>
-<div class="outline-text-2" id="text-orgefdb198">
+<div id="outline-container-orgebf17b3" class="outline-2">
+<h2 id="orgebf17b3">Tasks</h2>
+<div class="outline-text-2" id="text-orgebf17b3">
 <p>
 <code>herbie</code>'s concept of a "task" is not something <code>herbie</code> does but
 something <b>you</b> do.  A task a herbstluftwm "tag" holding a certain
@@ -415,9 +432,9 @@ tags that use the layout.
 </p>
 </div>
 
-<div id="outline-container-orgd7fae06" class="outline-3">
-<h3 id="orgd7fae06">Assure a task</h3>
-<div class="outline-text-3" id="text-orgd7fae06">
+<div id="outline-container-org2dda348" class="outline-3">
+<h3 id="org2dda348">Assure a task</h3>
+<div class="outline-text-3" id="text-org2dda348">
 <p>
 Running:
 </p>
@@ -436,9 +453,9 @@ $ herbie task dev mydev  (3)
 </div>
 </div>
 
-<div id="outline-container-org364f172" class="outline-3">
-<h3 id="org364f172">Finishing a task</h3>
-<div class="outline-text-3" id="text-org364f172">
+<div id="outline-container-org67ce79d" class="outline-3">
+<h3 id="org67ce79d">Finishing a task</h3>
+<div class="outline-text-3" id="text-org67ce79d">
 <p>
 When <code>herbie</code> is asked to "finish" a task, all windows are closed and the
 tag is removed (merged to another).
@@ -461,9 +478,9 @@ $ herbie fini -g irc dev
 </div>
 </div>
 
-<div id="outline-container-orga282d96" class="outline-3">
-<h3 id="orga282d96">Defining tasks</h3>
-<div class="outline-text-3" id="text-orga282d96">
+<div id="outline-container-org58eac58" class="outline-3">
+<h3 id="org58eac58">Defining tasks</h3>
+<div class="outline-text-3" id="text-org58eac58">
 <p>
 Tasks are defined as a tree data structure using <a href="https://en.wikipedia.org/wiki/S-expression">sexp</a> syntax in an
 almost exactly identical form as one may see from the command
@@ -512,9 +529,9 @@ herbstluftwm in forming the <i>condition</i> of a <i>rule</i>
 </div>
 </div>
 
-<div id="outline-container-orgf12ec9f" class="outline-3">
-<h3 id="orgf12ec9f">Interactivity</h3>
-<div class="outline-text-3" id="text-orgf12ec9f">
+<div id="outline-container-orgd6aca50" class="outline-3">
+<h3 id="orgd6aca50">Interactivity</h3>
+<div class="outline-text-3" id="text-orgd6aca50">
 <p>
 <code>herbie</code> is user-interactive.  The default UI is a GUI using <a href="https://github.com/davatorium/rofi">rofi</a> and
 <code>libnotify</code>.  An alternative UI uses the terminal.  To activate them,
@@ -530,7 +547,7 @@ $ herbie -u term tasks  # use terminal
 <p>
 It is intended to transition from having <code>herbie</code> explicitly execute
 <code>rofi</code> to having <code>herbie</code> act as a <code>rofi</code> <i>modi</i>.  As of now there is a mix of
-both interfaces.  See the section <a href="#org7f17ee9">Modi</a> below.
+both interfaces.  See the section <a href="#org69b6dc1">Modi</a> below.
 </p>
 
 </div>
@@ -594,9 +611,9 @@ the one to be finalize provides our landing spot.
 </div>
 </div>
 
-<div id="outline-container-orga51010e" class="outline-3">
-<h3 id="orga51010e">Calling from herbstluftwm</h3>
-<div class="outline-text-3" id="text-orga51010e">
+<div id="outline-container-org7595c11" class="outline-3">
+<h3 id="org7595c11">Calling from herbstluftwm</h3>
+<div class="outline-text-3" id="text-org7595c11">
 <p>
 In your <code>autostart</code> you may have some keybindings to run <code>herbie-dmenu</code>
 like:
@@ -611,9 +628,9 @@ hc keybind $Mod-Shift-i spawn herbie ifini
 </div>
 
 
-<div id="outline-container-org25a50c1" class="outline-2">
-<h2 id="org25a50c1">Loops</h2>
-<div class="outline-text-2" id="text-org25a50c1">
+<div id="outline-container-orgd036cd2" class="outline-2">
+<h2 id="orgd036cd2">Loops</h2>
+<div class="outline-text-2" id="text-orgd036cd2">
 <p>
 A herbie loop is a long-running function that responds to the events
 emitted by herbstluftwm.  Like "tasks" describe above one runs a loop
@@ -621,9 +638,9 @@ by naming it.
 </p>
 </div>
 
-<div id="outline-container-org1cfa6cd" class="outline-3">
-<h3 id="org1cfa6cd">Available loops</h3>
-<div class="outline-text-3" id="text-org1cfa6cd">
+<div id="outline-container-org01d70f6" class="outline-3">
+<h3 id="org01d70f6">Available loops</h3>
+<div class="outline-text-3" id="text-org01d70f6">
 <p>
 The available loops are printed with:
 </p>
@@ -650,9 +667,9 @@ for ordering.</dd>
 </div>
 </div>
 
-<div id="outline-container-org91dd0a2" class="outline-3">
-<h3 id="org91dd0a2">Running loops</h3>
-<div class="outline-text-3" id="text-org91dd0a2">
+<div id="outline-container-org717a16c" class="outline-3">
+<h3 id="org717a16c">Running loops</h3>
+<div class="outline-text-3" id="text-org717a16c">
 <p>
 A herbie loop may be run on the command line and will exit when a
 <code>reload</code> hook event is received from herbstlufwm.  To run herbie loops
@@ -668,9 +685,9 @@ herbie loop switch &amp;
 </div>
 </div>
 
-<div id="outline-container-org7f17ee9" class="outline-2">
-<h2 id="org7f17ee9">Modi</h2>
-<div class="outline-text-2" id="text-org7f17ee9">
+<div id="outline-container-org69b6dc1" class="outline-2">
+<h2 id="org69b6dc1">Modi</h2>
+<div class="outline-text-2" id="text-org69b6dc1">
 <p>
 <code>herbie</code> talks to <code>rofi</code> as a modi.  To summarize, here are some example
 keybindings.
@@ -702,9 +719,9 @@ We may, of course, use <code>rofi</code> <i>combi</i> to combine multiple herbie
 </div>
 </div>
 
-<div id="outline-container-org89957dd" class="outline-2">
-<h2 id="org89957dd">Layouts</h2>
-<div class="outline-text-2" id="text-org89957dd">
+<div id="outline-container-orgc066d99" class="outline-2">
+<h2 id="orgc066d99">Layouts</h2>
+<div class="outline-text-2" id="text-orgc066d99">
 <p>
 Frame layouts can be saved to herbstlufwm tags for later loading back
 to the screen.  This allows manual tweaks to be captured and easily
@@ -730,17 +747,41 @@ showing what is available for loading:
 
 
 
-<div id="outline-container-orge75bfc0" class="outline-2">
-<h2 id="orge75bfc0">Commands</h2>
-<div class="outline-text-2" id="text-orge75bfc0">
+<div id="outline-container-org525dda0" class="outline-2">
+<h2 id="org525dda0">Commands</h2>
+<div class="outline-text-2" id="text-org525dda0">
 <p>
 What remains are simply commands.  
 </p>
 </div>
 
-<div id="outline-container-org45345c4" class="outline-3">
-<h3 id="org45345c4"><code>svgicon</code></h3>
-<div class="outline-text-3" id="text-org45345c4">
+<div id="outline-container-org845d2fe" class="outline-3">
+<h3 id="org845d2fe"><code>totag</code></h3>
+<div class="outline-text-3" id="text-org845d2fe">
+<p>
+This is like <code>hc use</code> or <code>hc use_index</code> except if the requested tag is
+already in focus then instead <code>hc use_previous</code> is called.  In the usual
+<code>autostart</code> loop which binds to numbers:
+</p>
+
+<pre class="example">
+tag_keys=( {1..9} 0 )
+for tind in "${!tag_keys[@]}" 
+do
+    key="${tag_keys[$tind]}"
+    hc keybind "$Mod-$key" spawn herbie totag "$tind"
+done
+</pre>
+
+<p>
+See snippets for a faster way to do this directly with <code>herbstclient</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2bf817e" class="outline-3">
+<h3 id="org2bf817e"><code>svgicon</code></h3>
+<div class="outline-text-3" id="text-org2bf817e">
 <p>
 The <code>svgicon</code> command is not particularly meant to be used
 interactively.  It simply creates an icon representing a tag.
@@ -761,10 +802,156 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 </div>
+
+
+<div id="outline-container-org3a4c921" class="outline-2">
+<h2 id="org3a4c921">Caveats</h2>
+<div class="outline-text-2" id="text-org3a4c921">
+</div>
+<div id="outline-container-orge2faf1c" class="outline-3">
+<h3 id="orge2faf1c">Stability</h3>
+<div class="outline-text-3" id="text-orge2faf1c">
+<p>
+<code>herbie</code> is currently a personal test bed.  Please don't use it
+expecting it to not change.  If the version number strays from 0.0.0
+then some stability may be expected.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfcf8fab" class="outline-3">
+<h3 id="orgfcf8fab">Speed</h3>
+<div class="outline-text-3" id="text-orgfcf8fab">
+<p>
+Python has a very slow startup.  I'm seeing 70 ms just to do nothing
+and <code>herbie hc dump</code> takes about 200ms.  This is <b>not</b> due to herbstlufwm
+as <code>herbstclient dump</code> takes about 10ms.  This slowness will likely be
+noticeable for <code>herbie</code> commands that operate directly from a key
+binding (eg <code>totag</code> or <code>wswap</code>).  It probably will not be as noticeable
+for commands that work through <code>rofi</code> since they require additional time
+anyways to receive user input.
+</p>
+
+
+<p>
+In the snippets below are some ways to perform some of the <code>herbie</code>
+commands more directly.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4652ffd" class="outline-2">
+<h2 id="org4652ffd">Snippets</h2>
+<div class="outline-text-2" id="text-org4652ffd">
+<p>
+Not related to <code>herbie</code> per se but this section collects some useful
+snippets of <code>herbstclient</code> commands.  Some have been implemented (for
+better or worse) in <code>herbie</code> and others are possible candidates for
+implementation.  Most are gleaned from IRC and apologies for any
+missed attribution.
+</p>
+</div>
+
+<div id="outline-container-org0f58202" class="outline-3">
+<h3 id="org0f58202">Swap windows</h3>
+<div class="outline-text-3" id="text-org0f58202">
+<p>
+Often we end up wanting to "swap" two windows in some way.  Two things
+are given: the currently focused client and a direction in which to
+find a neighbor client.  The layout is rewritten with the two window
+IDs swapped and applied.
+</p>
+
+<p>
+On IRC <code>thorsten`</code> gave this example which is implemented for a
+"left-swap":
+</p>
+
+<pre class="example">
+hc keybind Ctrl-Alt-Super-l \
+  substitute OLDWIN clients.focus.winid chain \
+  , focus right \
+  , substitute NEWWIN clients.focus.winid \
+  spawn  ~/.config/herbstluftwm/swapwindows.sh OLDWIN NEWWIN  
+</pre>
+
+<p>
+With that script looking something like:
+</p>
+
+<pre class="example">
+old="$1" ; new="$2" ; l=$(herbstclient dump | sed "s,\\&lt;$old\\&gt;,0xTMP,;s,\\&lt;$new\\&gt;,$old,;s,\\&lt;0xTMP\\&gt;,$new,") ; herbstclient load "$l"   
+</pre>
+
+<p>
+Or all together:
+</p>
+
+<pre class="example">
+herbstclient keybind Ctrl-Alt-Super-l substitute OLDWIN clients.focus.winid chain , focus right , substitute NEWWIN clients.focus.winid spawn bash -c 'l=$(herbstclient dump | sed "s,\\&lt;$1\\&gt;,0xTMP,;s,\\&lt;$2\\&gt;,$1,;s,\\&lt;0xTMP\\&gt;,$2,") ; herbstclient load "$l"' -- OLDWIN NEWWIN
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgcae22c1" class="outline-3">
+<h3 id="orgcae22c1">Float a window and set it to a fixed size</h3>
+<div class="outline-text-3" id="text-orgcae22c1">
+<pre class="example">
+herbstclient substitute ID clients.focus.winid and . set_attr clients.focus.floating on . spawn xdotool windowsize ID 1000 500
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgd9a99e0" class="outline-3">
+<h3 id="orgd9a99e0">A faster <code>herbie totag</code></h3>
+<div class="outline-text-3" id="text-orgd9a99e0">
+<p>
+The <code>herbie totag</code> command is noticeably slow.  The same behavior can be
+achieved about 10x faster in a couple ways by having <code>herbstclient</code>
+perform the logic.
+</p>
+</div>
+
+<div id="outline-container-org9d79775" class="outline-4">
+<h4 id="org9d79775">The ask-first approach</h4>
+<div class="outline-text-4" id="text-org9d79775">
+<pre class="example">
+tag_keys=( {1..9} 0 )
+for tind in "${!tag_keys[@]}" 
+do
+    key="${tag_keys[$tind]}"
+    hc keybind "$Mod-$key" substitute TAG tags.$tind.name \
+      or , \
+        and . compare monitors.focus.tag = TAG \
+            . use_previous \
+         , use TAG  
+done
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgf23d61f" class="outline-4">
+<h4 id="orgf23d61f">The try-first approach</h4>
+<div class="outline-text-4" id="text-orgf23d61f">
+<p>
+Another take on this comes from IRC (<code>yushyin</code>) replaces the <code>hc keybind</code>
+in the above with this core:
+</p>
+
+<pre class="example">
+hc keybind "$Mod-$key" substitute PRE tags.focus.index \
+  chain + use_index "$tind" + or , compare tags.focus.index != PRE , use_previous 
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: BV</p>
-<p class="date">Created: 2021-02-08 Mon 22:03</p>
+<p class="date">Created: 2021-02-15 Mon 14:55</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

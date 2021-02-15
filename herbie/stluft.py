@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+'''
+Wrapper of herbstclient with some sugar.  See also herbie.util.
+'''
 import shlex
 import subprocess
 from collections import namedtuple
@@ -40,6 +44,7 @@ class WM:
             stderr=subprocess.PIPE,
             env=self.env,
             universal_newlines=True,
+            bufsize=-1,
             # Kill hc when it hangs due to crashed server:
             timeout=2
         )
@@ -53,6 +58,7 @@ class WM:
         if proc.returncode:
             raise RuntimeError(f'{self._hc} {cmd} failed:\n{proc.stderr}')
         return proc.stdout
+        
 
     def run(self):
         '''
