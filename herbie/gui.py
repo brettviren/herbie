@@ -64,7 +64,7 @@ class UI:
         # text = stringify(lines)
         if isinstance(lines, list):
             lines = '\n'.join(lines)
-        print("gui.run:", type(lines), repr(lines))
+        #print("gui.run:", type(lines), repr(lines))
 
         proc = subprocess.Popen(cmd,
                                 stdin=subprocess.PIPE,

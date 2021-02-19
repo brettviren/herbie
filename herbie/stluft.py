@@ -151,7 +151,12 @@ class WM:
         '''
         Return list of tags in given order
         '''
-        tis = sorted(self.taginfos, key=lambda o: getattr(o, order))
+        tis = self.taginfos
+        if order in ("index", "name", "status"):
+            tis = sorted(tis, key=lambda o: getattr(o, order))
+            return [ti.name for ti in tis]
+        tis = sorted(tis, key=lambda ti:
+                     self(f'attr tags.by-name.{ti.name}.{order}'))
         return [ti.name for ti in tis]
     
 
@@ -231,7 +236,7 @@ class WM:
             #bufsize=1,
             universal_newlines=True,
         )
-        print("reading idle")
+        #print("reading idle")
         for line in iter(proc.stdout.readline, ""):
             if line == "":
                 return

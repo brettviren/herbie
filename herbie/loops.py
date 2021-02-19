@@ -1,3 +1,6 @@
+import sys
+import time
+from collections import defaultdict
 
 def loop_dump(wm):
     for event in wm.events():
@@ -8,8 +11,6 @@ def loop_dump(wm):
         
         
 
-import time
-from collections import defaultdict
 
 def loop_switch(wm):
     '''
@@ -77,13 +78,15 @@ def loop_stamp(wm):
     # first, hit each tag and window to assure it has a my_focus_time
     # attribute set.
     for tagdot in wm("complete 1 attr tags.by-name.").split('\n'):
-        tag = tagdot.split('.',1)[0].strip()
-        if not tag:
+        parts = [t.strip() for t in tagdot.split('.') if t.strip()]
+        if not parts:
             continue
-        #print(f"tag {tag} my_focus_time")
+        tag = parts[-1]
+        sys.stderr.write(f"tag {tag} my_focus_time\n")
         try:
             wm(f'new_attr string tags.by-name.{tag}.my_focus_time {now}')
         except RuntimeError:
+            sys.stderr.write(f"failed to new on tag {tag} my_focus_time\n")
             pass            # assume alread set
         
     clis = wm("complete 1 attr clients.")
@@ -94,14 +97,14 @@ def loop_stamp(wm):
         wid = parts[1].strip()
         if not wid.startswith('0x'):
             continue
-        #print(f"window {wid} my_focus_time")
+        sys.stderr.write(f"window {wid} my_focus_time\n")
         try:
             wm(f'new_attr string clients.{wid}.my_focus_time {now}')
         except RuntimeError:
             pass            # assume alread set
 
     for event in wm.events('tag_changed|focus_changed|reload'):
-        #print(f'loop stamp with event {event}')
+        sys.stderr.write(f'loop stamp with event {event}\n')
         now = time.time()
         parts = event.split('\t')
         evt = parts[0]
@@ -114,6 +117,7 @@ def loop_stamp(wm):
             try:
                 wm(f'set_attr tags.by-name.{tag}.my_focus_time {now}')
             except RuntimeError:
+                sys.stderr.write(f"failed to set on tag {tag} my_focus_time\n")
                 pass
 
         if evt == "focus_changed":

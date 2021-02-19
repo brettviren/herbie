@@ -90,7 +90,7 @@ def waction(ctx):
         ("Toggle fullscreen", "fullscreen toggle"),
         ("Toggle pseudotile", "pseudotile toggle"),
     ]
-    for tag in wm.current_tags():
+    for tag in wm.current_tags('my_focus_time'):
         cmdlist.append((f'Move to tag {tag}', f'move {tag}'))
     ui = ctx.obj['ui']
     ui.monitor = "focused_window"
@@ -233,7 +233,7 @@ def totag(ctx, tag):
 
 @cli.command("tags")
 @click.option("-o","--order", default="index",
-              type=click.Choice(["index","name"]),
+              type=str,
               help="Set ordering")
 @click.pass_context
 def tags(ctx, order):
@@ -309,8 +309,15 @@ def ifini(ctx):
     Interactively finish a task screen by closing all windows and removing the tag.
     '''
     wm = ctx.obj['wm']
-    tags = wm.current_tags()
-    got = ctx.obj['ui'].choose(tags, "Tag to finish: ")
+    #sys.stderr.write('ifini\n')
+    tags = wm.current_tags('my_focus_time')
+    tags.reverse()
+    #sys.stderr.write(str(tags) + '\n')
+    ui = ctx.obj['ui']
+    ui.monitor = "focused"
+    ui.width = -20
+    ui.lines = len(tags)
+    got = ui.choose(tags, "Tag to finish: ")
     if not got:
         return
     got = got.split()
