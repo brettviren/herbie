@@ -103,7 +103,7 @@ def loop_stamp(wm):
         except RuntimeError:
             pass            # assume alread set
 
-    for event in wm.events('tag_changed|focus_changed|reload'):
+    for event in wm.events('tag_added|tag_changed|focus_changed|reload'):
         sys.stderr.write(f'loop stamp with event {event}\n')
         now = time.time()
         parts = event.split('\t')
@@ -111,6 +111,15 @@ def loop_stamp(wm):
 
         if evt == "reload":
             break
+
+        if evt == "tag_added":
+            tag = parts[1]
+            sys.stderr.write(f"tag_added {tag} my_focus_time\n")
+            try:
+                wm(f'new_attr string tags.by-name.{tag}.my_focus_time {now}')
+            except RuntimeError:
+                sys.stderr.write(f"tag_added failed to new on tag {tag} my_focus_time\n")
+                pass            # assume alread set
 
         if evt == "tag_changed":
             tag = parts[1]
