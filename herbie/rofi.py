@@ -80,7 +80,7 @@ def layout_text(lay, match_sexp):
     return f'<span color="red">{lay.name}</span>'
     
 
-def layout_menu_one(wm, name, kwargs, submenu=False):
+def layout_menu_one(wm, name, tag, cursexp, kwargs, submenu=False):
     caps = name.capitalize()
     Item = globals()[f'Layout{caps}Item']
 
@@ -91,9 +91,8 @@ def layout_menu_one(wm, name, kwargs, submenu=False):
         items.append(Item(**k))
 
     if name == "save":
-        tag,sexp = kwargs[0]['tag'], kwargs[0]['cursexp']
         m = LayoutSaveMenu(f"{caps} layout", items, wm,
-                           tag, sexp)
+                           tag, cursexp)
     else:
         m = menu.Menu(prompt=f"{caps} layout", items=items)
         
@@ -103,7 +102,7 @@ def layout_menu_one(wm, name, kwargs, submenu=False):
     return m
 
 
-def layout_menu(wm, which=None, tag = None):
+def layout_menu(wm, which=None, tag=None):
 
     tag = tag or wm.focused_tag
     cursexp = wm(f'dump {tag}').strip()
@@ -111,7 +110,7 @@ def layout_menu(wm, which=None, tag = None):
     icons = make_icons(oldlays, tag)
 
     kwargs = list()
-    for lay,icon in zip(oldlays,icons):
+    for lay, icon in zip(oldlays,icons):
         if not lay.name:
             continue
         if not lay.sexp:
@@ -125,9 +124,9 @@ def layout_menu(wm, which=None, tag = None):
         which = "load save drop".split()
 
     if isinstance(which, str):
-        return layout_menu_one(wm, which, kwargs)
+        return layout_menu_one(wm, which, tag, cursexp, kwargs)
 
-    submenus = [layout_menu_one(wm, one, kwargs, True) for one in which]
+    submenus = [layout_menu_one(wm, one, tag, cursexp, kwargs, True) for one in which]
 
     return menu.Menu(prompt="Layout operation", items = submenus)
 
