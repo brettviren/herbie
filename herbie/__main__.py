@@ -91,20 +91,50 @@ def waction(ctx):
         ("Toggle pseudotile", "pseudotile toggle"),
     ]
     for tag in wm.current_tags('my_focus_time'):
-        cmdlist.append((f'Move to tag {tag}', f'move {tag}'))
+        cmdlist.append((f'Move to tag {tag}',
+                        f'move {tag};use {tag}'))
     ui = ctx.obj['ui']
     ui.monitor = "focused_window"
     ui.location = 'tl'
     ui.lines = len(cmdlist)
     got = ui.choose([c[0] for c in cmdlist], "Window action")
+    #print(f'got: {got}')
     if not got:
         return
     got = got.strip()
     for arg, cmd in cmdlist:
         if arg != got:
             continue
+        if ";" in cmd:
+            for one in cmd.split(";"):
+                one = one.strip()
+                if not one:
+                    continue
+                wm.add(one)
+            wm.run()
+            return
+        
+        # immediate
         wm(cmd)
         return
+    
+    
+    # Note, may need Ctrl-Enter to avoid picking match
+    if " " in got:              # treat as command(s)
+        print(f'got: {got}')
+        for one in got.split(";"):
+            one = one.strip()
+            if not one:
+                continue
+            wm.add(one)
+        wm.run()
+        return
+
+    # else treat as name of new tag
+    wm.add(f'add {got}')
+    wm.add(f'move {got}')
+    wm.add(f'use {got}')
+    wm.run()
 
 @cli.command("hc")
 @click.argument("args", nargs=-1)

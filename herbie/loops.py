@@ -54,8 +54,13 @@ def loop_switch(wm):
 
         timed = list()
         for wid in wids:
-            t = wm(f'attr clients.{wid}.my_focus_time')
+            try:
+                t = wm(f'attr clients.{wid}.my_focus_time')
+            except RuntimeError:
+                continue
             timed.append((float(t), wid))
+        if len(timed) < 2:
+            continue
         timed.sort()
         timed.reverse()
         sequence = [t[1] for t in timed]
