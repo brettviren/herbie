@@ -75,9 +75,10 @@ class LayoutSaveMenu(menu.Menu):
         return BAIL
 
 def layout_text(lay, match_sexp):
-    if lay.sexp == match_sexp:
-        return f'<span color="green">{lay.name}</span>'
-    return f'<span color="red">{lay.name}</span>'
+    return lay.name
+    # if lay.sexp == match_sexp:
+    #     return f'<span color="green">{lay.name}</span>'
+    # return f'<span color="red">{lay.name}</span>'
     
 
 def layout_menu_one(wm, name, tag, cursexp, kwargs, submenu=False):
