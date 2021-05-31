@@ -98,10 +98,11 @@ def rofi(wm, tag, oldlays, cursexp=None):
 
         #print ("cur:",cursexp)
         #print ("lay:",lay.sexp)
-        if cursexp and cursexp == lay.sexp:
-            lname = f'<span color="green">{lay.name}</span>'
-        else:
-            lname = f'<span color="red">{lay.name}</span>'
+        # if cursexp and cursexp == lay.sexp:
+        #     lname = f'<span color="green">{lay.name}</span>'
+        # else:
+        #     lname = f'<span color="red">{lay.name}</span>'
+        lname = lay.name
 
         tree = make_tree(lay.sexp)
         iname = f'herbie{tag}{lay.name}'
