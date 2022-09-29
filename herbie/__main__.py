@@ -89,6 +89,7 @@ def waction(ctx):
         ("Close", "close"),
         ("Toggle fullscreen", "fullscreen toggle"),
         ("Toggle pseudotile", "pseudotile toggle"),
+        ("Toggle floating", "pseudotile floating"),
     ]
     for tag in wm.current_tags('my_focus_time'):
         cmdlist.append((f'Move to tag {tag}',
