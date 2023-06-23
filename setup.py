@@ -19,8 +19,8 @@ setuptools.setup(
         "sexpdata",
         "anytree",
         "rofi_menu",
-        "vext",
-        "vext.gi",
+#        "vext",
+#        "vext.gi",
     ],
     entry_points = dict(
         console_scripts = [
