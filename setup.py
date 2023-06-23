@@ -19,8 +19,10 @@ setuptools.setup(
         "sexpdata",
         "anytree",
         "rofi_menu",
-#        "vext",
-#        "vext.gi",
+        ## these are needed in venv, but fail for user install
+        ## if needed, install them manually.
+        # "vext",
+        # "vext.gi",
     ],
     entry_points = dict(
         console_scripts = [

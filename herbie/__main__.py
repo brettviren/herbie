@@ -86,9 +86,11 @@ def waction(ctx):
     '''
     wm = ctx.obj['wm']
     cmdlist = [
+        ("Minimize", "set_attr clients.focus.minimized true"),
         ("Close", "close"),
         ("Toggle fullscreen", "fullscreen toggle"),
         ("Toggle pseudotile", "pseudotile toggle"),
+        ("Toggle floating", "pseudotile floating"),
     ]
     for tag in wm.current_tags('my_focus_time'):
         cmdlist.append((f'Move to tag {tag}',
@@ -181,6 +183,25 @@ def wswap(ctx, direction, windows):
 
 
     
+@cli.command("layouts")
+@click.option("-l", "--load", type=str, default=None,
+              help="Name the layout to load")
+@click.pass_context
+def do_layouts(ctx, load):
+    from .layouts import read_store
+    wm = ctx.obj['wm']
+
+    if load:
+        for one in read_store(wm):
+            if one.name == load:
+                cmd=one.sexp
+                print(cmd)
+                wm(f'load "{cmd}"')
+                return
+    for one in read_store(wm):
+        print (one)
+
+    
 
 @cli.command("layout")
 @click.option("-t", "--tag", type=str, default=None,
@@ -212,6 +233,7 @@ def do_layout(ctx, tag, action, args):
     lm = rofi.layout_menu(wm, action, tag)
     rofi.menu.run(lm, rofi_version="1.6", debug=False)
     
+
 
 
 @cli.command("svgicon")

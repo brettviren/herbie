@@ -66,14 +66,14 @@ def nested(tree, x, y, w, h, strokewidth=1):
     return lines
         
 
-def make_icon(name, tree, width = 100, height = 100):
+def make_icon(name, tree, width = 100, height = 100, fill='#66FF66'):
     '''
     Generate icon representing tree, return filename.
 
     File is named so that "name" can be used to name the icon to rofi.
     '''
     lines = [ header(width, height) ]
-    lines += [ rectangle(width, height) ]
+    lines += [ rectangle(width, height, fill=fill) ]
     lines += nested(tree, 0, 0, width, height, 10)
     lines += [ trailer() ]
     text = '\n'.join(lines)
