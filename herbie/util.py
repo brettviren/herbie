@@ -110,7 +110,11 @@ def tree_from_sexp(sexp, parent=None):
     if parent:
         index = len(parent.children)
     node = binode(parent, index)
-    node.what = sexp.pop(0).value()
+    got = sexp.pop(0)
+    # import sys
+    # sys.stderr.write(f'GOT {type(got)} |{got}| {dir(got)}\n')
+    # node.what = got.value()
+    node.what = got
     setattr(node, node.what, True)
 
     node.attrs = list()
@@ -120,7 +124,8 @@ def tree_from_sexp(sexp, parent=None):
             tree_from_sexp(term, node)
             continue
 
-        val = term.value()
+        # val = term.value()
+        val = term
         try:
             key,value = val.split(":",1)
         except ValueError:

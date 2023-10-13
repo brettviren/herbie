@@ -2,9 +2,9 @@
 '''
 This is an opnionated GUI for "herbie -u gui [...]".
 '''
-import gi
-gi.require_version('Notify', '0.7')
-from gi.repository import Notify
+# import gi
+# gi.require_version('Notify', '0.7')
+# from gi.repository import Notify
 
 import sys
 import subprocess
