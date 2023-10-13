@@ -86,6 +86,7 @@ def waction(ctx):
     '''
     wm = ctx.obj['wm']
     cmdlist = [
+        ("Minimize", "set_attr clients.focus.minimized true"),
         ("Close", "close"),
         ("Toggle fullscreen", "fullscreen toggle"),
         ("Toggle pseudotile", "pseudotile toggle"),

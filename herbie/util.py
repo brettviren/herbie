@@ -1,3 +1,4 @@
+import sys
 import time
 import sexpdata
 from anytree import Node
@@ -110,11 +111,10 @@ def tree_from_sexp(sexp, parent=None):
     if parent:
         index = len(parent.children)
     node = binode(parent, index)
-    got = sexp.pop(0)
-    # import sys
-    # sys.stderr.write(f'GOT {type(got)} |{got}| {dir(got)}\n')
-    # node.what = got.value()
-    node.what = got
+    top = sexp.pop(0)
+    ## api change?
+    #node.what = top.value()
+    node.what = top
     setattr(node, node.what, True)
 
     node.attrs = list()
@@ -124,7 +124,6 @@ def tree_from_sexp(sexp, parent=None):
             tree_from_sexp(term, node)
             continue
 
-        # val = term.value()
         val = term
         try:
             key,value = val.split(":",1)
