@@ -124,7 +124,7 @@ def tree_from_sexp(sexp, parent=None):
             tree_from_sexp(term, node)
             continue
 
-        val = term# .value()
+        val = term
         try:
             key,value = val.split(":",1)
         except ValueError:
