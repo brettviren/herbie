@@ -162,22 +162,22 @@ def wswap(ctx, direction, windows):
     '''
     Swap focused window with neighbor in given direction.
     '''
-    print (windows)
+    #print (windows)
     wm = ctx.obj['wm']
     if windows:
         layout = wm("dump")
         tag = wm.focused_tag
-        print (layout)
+        # print (layout)
         # move one out of way
         layout = layout.replace(windows[0], "TMP")
         layout = layout.replace(windows[1], windows[0])
         layout = layout.replace("TMP", windows[1])
-        print(layout)
+        #print(layout)
         wm(f"load {tag} '{layout}'")
 
     else:
         cmd=f"substitute OLDWIN clients.focus.winid chain , focus {direction} , substitute NEWWIN clients.focus.winid spawn herbie wswap --windows OLDWIN NEWWIN"
-        print(cmd)
+        #print(cmd)
         wm(cmd)
 
 
@@ -195,11 +195,11 @@ def do_layouts(ctx, load):
         for one in read_store(wm):
             if one.name == load:
                 cmd=one.sexp
-                print(cmd)
+                #print(cmd)
                 wm(f'load "{cmd}"')
                 return
-    for one in read_store(wm):
-        print (one)
+    # for one in read_store(wm):
+    #     print (one)
 
     
 
@@ -231,6 +231,7 @@ def do_layout(ctx, tag, action, args):
     wm = ctx.obj['wm']
     tag = tag or wm.focused_tag
     lm = rofi.layout_menu(wm, action, tag)
+    # sys.stderr.write(str(lm) + "\n")
     rofi.menu.run(lm, rofi_version="1.6", debug=False)
     
 

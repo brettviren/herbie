@@ -3,7 +3,7 @@ import asyncio
     
 from herbie.events import parse
 
-async def hcidle(hub, wants=()):
+async def hcidle(queue, wants=()):
     cmd = ['herbstclient', '--idle'] + list(wants)
     proc = await asyncio.create_subprocess_exec(
         *cmd,
@@ -13,5 +13,5 @@ async def hcidle(hub, wants=()):
         line = await proc.stdout.readline()
         line = line.decode().strip()
         obj = parse(line)
-        hub.publish(obj)
+        await queue.put_nowait(obj)
     
