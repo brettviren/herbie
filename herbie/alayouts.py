@@ -50,7 +50,7 @@ def read_store(tag):
     p = tag_path(tag)
     if not p.exists():
         return []
-    return [Layout(name=one.stem, sexp=one.read_text())
+    return [Layout(name=one.stem, sexp=one.read_text().strip())
             for one in p.glob("*.layout")]
 
 
@@ -88,7 +88,7 @@ def make_icons(oldlays, tag):
         ret.append(iname)
     return ret
 
-def layout_text(lay, match_sexp):
+def layout_text(lay, **kwds):
     return lay.name
     # if lay.sexp == match_sexp:
     #     return f'<span color="green">{lay.name}</span>'

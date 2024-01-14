@@ -1,0 +1,15 @@
+<svg width='512px' height='512px' xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink'>
+    <rect fill='white' stroke='white' stroke-width='0px' width='512' height='512' y='0' x='0' ry='0' rx='0' />
+    <line stroke='black' stroke-width='8px' y2='64' x2='448' y1='64' x1='0' />
+    <line stroke='black' stroke-width='8px' y2='512' x2='64' y1='64' x1='64' />
+    <line stroke='black' stroke-width='8px' y2='192' x2='64' y1='192' x1='0' />
+    <line stroke='black' stroke-width='8px' y2='384' x2='512' y1='384' x1='0' />
+    <line stroke='black' stroke-width='8px' y2='64' x2='128' y1='0' x1='128' />
+    <line stroke='black' stroke-width='8px' y2='448' x2='320' y1='0' x1='320' />
+    <line stroke='black' stroke-width='8px' y2='320' x2='448' y1='320' x1='64' />
+    <line stroke='black' stroke-width='8px' y2='192' x2='448' y1='192' x1='320' />
+    <line stroke='black' stroke-width='8px' y2='448' x2='448' y1='448' x1='64' />
+    <line stroke='black' stroke-width='8px' y2='512' x2='448' y1='0' x1='448' />
+    <line stroke='black' stroke-width='8px' y2='512' x2='192' y1='320' x1='192' />
+    <line stroke='black' stroke-width='8px' y2='320' x2='384' y1='192' x1='384' />
+</svg>

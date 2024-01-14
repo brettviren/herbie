@@ -49,10 +49,12 @@ class Herbie:
     async def run(self):
         await init_my_focus_time()
 
+        log.debug('starting herbstclient --idle')
         idle = await asyncio.create_subprocess_exec(
             'herbstclient', '--idle',
             stdout=asyncio.subprocess.PIPE)
 
+        log.debug('looping on hooks')
         while True:
 
             line = await idle.stdout.readline()
@@ -115,17 +117,20 @@ class Herbie:
         for tname, task in tasks.items():
             items.append(Item(tname, value=task, icon=tname))
         log.debug(f"TASK START with {len(items)} known tasks")
-        menu = Menu(items, prompt="Start a task")
+        menu = Menu(items, prompt="Start a btask")
         got = await self.task_menu_render(menu)
         if not got or not got[0]:
+            log.debug('task menu returns nothing')
             return
         task_name = got[0]
 
+        await hc(f'add {task_name}')
+
         ind = menu.index(task_name)
         if ind is None:
+            log.debug(f'novel task "{task_name}"')
+            # fixme: probably should save or something
             return
-
-        await hc(f'add {task_name}')
 
         task = items[ind].value
         tree = make_tree(task)
@@ -216,49 +221,98 @@ class Herbie:
     async def layout_load(self, name):
         '''
         Open a menu to select a layout to load.
+
+        If name returned which is new, then save current to that name.
         '''
         tag = await focused_tag()
         lays = layouts.read_store(tag)
         cursexp = await get_layout(tag)
         icons = layouts.make_icons(lays, tag)
 
-        menu = Menu(list(), prompt="layout", message="Give new name to save current")
+        menu = Menu(list(), prompt="layout to load",
+                    message="New name saves current")
         for lay, icon in zip(lays, icons):
-            text = layouts.layout_text(lay, cursexp)
-            log.debug(f'LAYOUT {text=} {icon=} {lay=}')
-            menu.items.append(Item(text, lay, icon))
+            menu.items.append(Item(lay.name, lay, icon))
 
-        for text in await self.layout_load_render(menu):
-            ind = menu.index(text)
-            if ind is None:
-                lay = layouts.Layout(text, cursexp)
-                layouts.add_store(lay, tag)
-                continue        # fixme: wise? subject to typos
-            lay = lays[ind]
-            cmd = ['load', lay.sexp]
-            await hc(*cmd)
+        name = await self.layout_load_render(menu)
+        if not name:
+            return
+
+        name = name[0]
+        ind = menu.index(name)
+        if ind is None and name not in lays: # new
+            lay = layouts.Layout(name, cursexp)
+            layouts.add_store(lay, tag)
+            return
+
+        lay = lays[ind]
+        cmd = ['load', lay.sexp]
+        await hc(*cmd)
+
+    async def layout_save(self, name):
+        '''
+        Save current layout.
+
+        This may overwrite existing name.
+        '''
+        tag = await focused_tag()
+        lays = layouts.read_store(tag)
+        cursexp = await get_layout(tag)
+        icons = layouts.make_icons(lays, tag)
+
+        menu = Menu(list(), prompt="save layout to name")
+        for lay, icon in zip(lays, icons):
+            menu.items.append(Item(lay.name, lay, icon))
+
+        name = await self.layout_load_render(menu)
+        if not name:
+            return
+
+        name = name[0]
+        lay = layouts.Layout(name, cursexp)
+        layouts.add_store(lay, tag)
 
     layout_drop_render = Rofi(multi_select=True)
     async def layout_drop(self, name):
         '''
-        Ask user for a layout to drop
+        Ask user for a layout to drop.
+
+        If drop current then go to first remaining.
         '''
         tag = await focused_tag()
         lays = layouts.read_store(tag)
         cursexp = await get_layout(tag)
         icons = layouts.make_icons(lays, tag)
 
-        menu = Menu(list(), prompt="layout to drop")
+        menu = Menu(list(), prompt="layout to drop",
+                    message="New name saves current")
         for lay, icon in zip(lays, icons):
-            text = layouts.layout_text(lay, cursexp)
-            log.debug(f'LAYOUT {text=} {icon=} {lay=}')
-            menu.items.append(Item(text, lay, icon))
+            menu.items.append(Item(lay.name, lay, icon))
 
-        for text in await self.layout_drop_render(menu):
-            ind = menu.index(text)
-            if ind is None:
-                continue        # fixme: wise? subject to typos
-            layouts.del_store(lays[ind], tag)
+        drop_cur = False
+        for name in await self.layout_drop_render(menu):
+            ind = menu.index(name)
+            if ind is None:     # new
+                lay = layouts.Layout(name, cursexp)
+                layouts.add_store(lay, tag)
+                continue
+            dead = lays[ind]
+            lays[ind] = None
+            if dead.sexp == cursexp:
+                drop_cur=True
+            log.debug(f'LAYOUT DROP {name=} {ind=} {dead=} {drop_cur=}')
+            layouts.del_store(dead, tag)
+
+        # drop the current layout, so pick first one and apply it.
+        if drop_cur:
+            for lay in lays:
+                if lay is None:
+                    continue
+                cmd = ['load', lay.sexp]
+                await hc(*cmd)
+                return
+            
+
         
     window_select_render = Rofi(columns=3)
     async def _window_jump(self, want_tag=None):
