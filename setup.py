@@ -23,6 +23,7 @@ setuptools.setup(
     ],
     entry_points = dict(
         console_scripts = [
+            'herbie-old-and-busted = herbie.oab:main',
             'herbie = herbie.__main__:main',
         ]
     ),

@@ -4,3 +4,8 @@
 README.html
 *.egg*
 __pycache__
+*.log
+log
+old
+cut
+build
