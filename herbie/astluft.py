@@ -1,3 +1,6 @@
+'''
+An async interface to herbsluftwm via the client.
+'''
 import asyncio
 from datetime import datetime
 from herbie.util import make_tree
@@ -5,10 +8,13 @@ from herbie.util import make_tree
 import logging
 log = logging.getLogger("herbie")
 
+
 def now():
     return str(datetime.now().timestamp())
 
+
 herbstclient = "herbstclient"
+
 
 async def hc(*args):
     '''
@@ -17,9 +23,7 @@ async def hc(*args):
     if len(args) == 1 and isinstance(args[0],str):
         args = args[0].split(" ")
 
-    log.debug(f'hc: {args}')    
     argstr = ' '.join(args)
-    log.debug(f'hc: {argstr}')
     proc = await asyncio.create_subprocess_exec(
         herbstclient, *args,
         stdout=asyncio.subprocess.PIPE)
@@ -27,11 +31,13 @@ async def hc(*args):
     got = got.decode()
     return got
 
+
 async def load_layout(tag, sexp):
     '''
     Load a layout into tag.
     '''
     await hc('load', tag, sexp)
+
 
 async def get_layout(tag):
     '''
@@ -39,6 +45,7 @@ async def get_layout(tag):
     '''
     got = await hc('dump', tag)
     return got.strip()
+
 
 async def tags_arg(tags=None):
     '''
@@ -64,6 +71,7 @@ async def tag_status():
         tis[name] = status
     return tis
 
+
 async def window_info(wid):
     '''
     Return dict of attributes for window of given wid or "focus".
@@ -78,8 +86,8 @@ async def window_info(wid):
         if not line:
             continue
 
-        t,_,_ = line[:5].split(' ')
-        k,v = line[6:].split(" = ")
+        t, _, _ = line[:5].split(' ')
+        k, v = line[6:].split(" = ")
 
         if t == "b":        # boolean
             v = v == "true"
@@ -104,29 +112,29 @@ async def window_info(wid):
             continue
         ret[k] = v
     return ret
-    
+
 
 async def window_times(want_tag=None):
     '''
-    Return list of tuples (wid,tag,time) 
+    Return list of tuples (wid,tag,time)
 
     If want_tag is given, filter list to only include that tag
     '''
-    cmd=["foreach","C",'clients.',
-         'sprintf','T','%c.tag','C',
-         'substitute','TAG','T',
-         'sprintf','F','%c.my_focus_time','C',
-         'substitute','FOCUS','F',
-         'sprintf','W','%c.winid','C',
-         'substitute','WINID','W',
-         'echo','WINID','TAG','FOCUS']
+    cmd=["foreach", "C", 'clients.',
+         'sprintf', 'T', '%c.tag', 'C',
+         'substitute', 'TAG', 'T',
+         'sprintf', 'F', '%c.my_focus_time', 'C',
+         'substitute', 'FOCUS', 'F',
+         'sprintf', 'W', '%c.winid', 'C',
+         'substitute', 'WINID', 'W',
+         'echo', 'WINID', 'TAG', 'FOCUS']
     got = await hc(*cmd)
     ret = list()
     for one in got.split("\n"):
         one = one.strip()
         if not one:
             continue
-        wid,tag,time = one.split()
+        wid, tag, time = one.split()
         if want_tag and tag != want_tag:
             continue
         ret.append((wid, tag, float(time)))
@@ -135,16 +143,16 @@ async def window_times(want_tag=None):
 
 async def window_ids(want_tag=None):
     '''
-    Return list of tuples (wid,tag) 
+    Return list of tuples (wid,tag)
 
     If want_tag is given, filter list to only include that tag
     '''
-    cmd=["foreach","C",'clients.',
-         'sprintf','T','%c.tag','C',
-         'substitute','TAG','T',
-         'sprintf','W','%c.winid','C',
-         'substitute','WINID','W',
-         'echo','WINID','TAG']
+    cmd=["foreach", "C", 'clients.',
+         'sprintf', 'T', '%c.tag', 'C',
+         'substitute', 'TAG', 'T',
+         'sprintf', 'W', '%c.winid', 'C',
+         'substitute', 'WINID', 'W',
+         'echo', 'WINID', 'TAG']
     got = await hc(*cmd)
     ret = list()
     for one in got.split("\n"):
@@ -157,43 +165,49 @@ async def window_ids(want_tag=None):
         ret.append((wid, tag))
     return ret
 
+
 async def window_ids_by_tag():
     ret = defaultdict(list)
     for wid,tag in await window_ids():
         ret[tag].append(wid)
     return wid
 
+
 async def tag_times():
     '''
     Return list of tuples (tags,time)
     '''
-    cmd=["foreach","T","tags.by-name.","sprintf","N",
-         '%c.name',"T","substitute","NAME","N",
-         "sprintf","F","%c.my_focus_time","T",
-         "substitute","FOCUS","F",
-         "echo","NAME","FOCUS"]
+    cmd=["foreach", "T", "tags.by-name.", "sprintf", "N",
+         '%c.name', "T", "substitute", "NAME", "N",
+         "sprintf", "F", "%c.my_focus_time", "T",
+         "substitute", "FOCUS", "F",
+         "echo", "NAME", "FOCUS"]
     got = await hc(*cmd)
     ret = list()
     for one in got.split("\n"):
         one = one.strip()
         if not one:
             continue
-        tag,time = one.split()
+        tag, time = one.split()
         ret.append((tag, float(time)))
     return sorted(ret, key=lambda tt: tt[1])
 
+
 async def focused_tag():
-    got = await hc('get_attr','tags.focus.name')
+    got = await hc('get_attr', 'tags.focus.name')
     return got.strip()
+
 
 async def focused_wid():
     got = await hc('get_attr', 'tags.focus.focused_client.winid')
     return got.strip()
 
+
 async def all_tags():
     text = await hc("tag_status")
     parts = text.strip().split('\t')
-    return tuple( [p[1:] for p in parts] )
+    return tuple([p[1:] for p in parts])
+
 
 async def init_my_focus_time():
     tagdots = await hc(*"complete 1 attr tags.by-name.".split())
@@ -205,7 +219,7 @@ async def init_my_focus_time():
         tag = parts[-1]
         time = now()
         attr = f'tags.by-name.{tag}.my_focus_time'
-        cmd = ['or',',',
+        cmd = ['or', ',',
                'get_attr', attr, ',',
                'new_attr', 'string', attr, time]
         await hc(*cmd)
@@ -224,6 +238,7 @@ async def init_my_focus_time():
                'get_attr', attr, ',',
                'new_attr', 'string', attr, time]
         await hc(*cmd)
+
 
 async def clear_tag(tag, goto=None):
     '''
@@ -251,5 +266,3 @@ async def clear_tag(tag, goto=None):
     await hc(f'use {goto}')
     if mergeto:
         await hc(f'merge_tag {tag} {mergeto}')
-
-    
