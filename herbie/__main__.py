@@ -112,7 +112,11 @@ class Herbie:
         '''
         Create a tag with a layout.
         '''
-        tasks = self.cfg['tasks']
+        try:
+            tasks = self.cfg['tasks']
+        except KeyError:
+            log.error("no tasks")
+            return
         items = list()
         for tname, task in tasks.items():
             items.append(Item(tname, value=task, icon=tname))
@@ -369,7 +373,7 @@ def get_config(cfgfile = None):
     home = Path(os.environ['HOME'])
 
     if not cfgfile:             # old spot
-        cfgfile = home / ".herbierc"
+        cfgfile = home/ ".config/herbie/herbie.cfg"
 
     if cfgfile:
         log.info(f"loading {cfgfile}")
