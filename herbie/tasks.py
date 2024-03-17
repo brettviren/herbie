@@ -71,7 +71,14 @@ def toscreen(wm, cfg, task, tag = None):
 
     wincfg = windows_config(cfg)
 
-    dump = cfg["tasks"][task]
+    try:
+        dump = cfg["tasks"][task]
+    except KeyError:
+        print(f'no task {task}, will just make a tag')
+        wm.add(f'use {tag}')
+        wm.run()
+        return
+
     tree = make_tree(dump)
 
     layout = render_split(tree)
