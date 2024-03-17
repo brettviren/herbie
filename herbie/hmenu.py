@@ -64,16 +64,16 @@ class Rofi:
     A menu implemented with rofi.
     '''
 
-    literal : bool = False
-    monitor : str = None
-    location : str = None
-    multi_select : bool = False
-    columns : int = None
+    literal: bool = False
+    monitor: str = None
+    location: str = None
+    multi_select: bool = False
+    columns: int = None
 
     def monitor_options(self):
         option = {
-            "focused":-1, "focused_window":-2, "atmouse":-3,
-            "withfocus":-4, "withmouse":-5}
+            "focused": -1, "focused_window": -2, "atmouse": -3,
+            "withfocus": -4, "withmouse": -5}
         if self.monitor is None:
             return []
 
@@ -85,9 +85,9 @@ class Rofi:
 
     def location_options(self):
         option = {
-            "tl":1, "tc":2, "tr":3,
-            "ml":8, "mc":0, "mr":4,
-            "bl":7, "bc":6, "br":5 }
+            "tl": 1, "tc": 2, "tr": 3,
+            "ml": 8, "mc": 0, "mr": 4,
+            "bl": 7, "bc": 6, "br": 5}
         if self.location is None:
             return []
         try:

@@ -115,7 +115,9 @@ class Herbie:
         Restart self.
         '''
         log.info("reloading")
-        os.execv(__file__, sys.argv)
+        #os.execv(__file__, sys.argv)
+        log.info(f'command: {sys.argv}')
+        os.execv(sys.argv[0], sys.argv)
         log.info("reloaded")
 
     task_menu_render = Rofi()
