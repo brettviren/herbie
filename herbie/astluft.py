@@ -26,7 +26,8 @@ async def hc(*args):
     argstr = ' '.join(args)
     proc = await asyncio.create_subprocess_exec(
         herbstclient, *args,
-        stdout=asyncio.subprocess.PIPE)
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE)
     got = await proc.stdout.read()
     got = got.decode()
     return got
