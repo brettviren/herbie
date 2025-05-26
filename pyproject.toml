@@ -1,0 +1,23 @@
+[project]
+name = "herbie"
+version = "0.1.0"
+description = "Add your description here"
+readme = {file = "README.org", content-type = "text/org"}
+authors = [
+    { name = "Brett Viren", email = "brett.viren@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "anytree>=2.13.0",
+    "click>=8.2.1",
+    "pygobject>=3.52.3",
+    "rofi-menu>=0.6",
+    "sexpdata>=1.0.2",
+]
+
+[project.scripts]
+herbie = "herbie.__main__:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"

@@ -1,0 +1,76 @@
+#+title herbstluftwm tips
+
+
+Not related to ~herbie~ per se but this section collects some useful
+snippets of ~herbstclient~ commands.  Some have been implemented (for
+better or worse) in ~herbie~ and others are possible candidates for
+implementation.  Most are gleaned from IRC and apologies for any
+missed attribution.
+
+** Swap windows
+
+Often we end up wanting to "swap" two windows in some way.  Two things
+are given: the currently focused client and a direction in which to
+find a neighbor client.  The layout is rewritten with the two window
+IDs swapped and applied.
+
+On IRC ~thorsten`~ gave this example which is implemented for a
+"left-swap":
+
+#+begin_example
+hc keybind Ctrl-Alt-Super-l \
+  substitute OLDWIN clients.focus.winid chain \
+  , focus right \
+  , substitute NEWWIN clients.focus.winid \
+  spawn  ~/.config/herbstluftwm/swapwindows.sh OLDWIN NEWWIN  
+#+end_example
+
+With that script looking something like:
+
+#+begin_example
+old="$1" ; new="$2" ; l=$(herbstclient dump | sed "s,\\<$old\\>,0xTMP,;s,\\<$new\\>,$old,;s,\\<0xTMP\\>,$new,") ; herbstclient load "$l"   
+#+end_example
+
+Or all together:
+
+#+begin_example
+herbstclient keybind Ctrl-Alt-Super-l substitute OLDWIN clients.focus.winid chain , focus right , substitute NEWWIN clients.focus.winid spawn bash -c 'l=$(herbstclient dump | sed "s,\\<$1\\>,0xTMP,;s,\\<$2\\>,$1,;s,\\<0xTMP\\>,$2,") ; herbstclient load "$l"' -- OLDWIN NEWWIN
+#+end_example
+
+
+** Float a window and set it to a fixed size
+
+#+begin_example
+herbstclient substitute ID clients.focus.winid and . set_attr clients.focus.floating on . spawn xdotool windowsize ID 1000 500
+#+end_example
+
+** A faster ~herbie totag~
+
+The ~herbie totag~ command is noticeably slow.  The same behavior can be
+achieved about 10x faster in a couple ways by having ~herbstclient~
+perform the logic.
+
+*** The ask-first approach
+
+#+begin_example
+  tag_keys=( {1..9} 0 )
+  for tind in "${!tag_keys[@]}" 
+  do
+      key="${tag_keys[$tind]}"
+      hc keybind "$Mod-$key" substitute TAG tags.$tind.name \
+        or , \
+          and . compare monitors.focus.tag = TAG \
+              . use_previous \
+           , use TAG  
+  done
+#+end_example
+
+*** The try-first approach
+
+Another take on this comes from IRC (~yushyin~) replaces the ~hc keybind~
+in the above with this core:
+
+#+begin_example
+  hc keybind "$Mod-$key" substitute PRE tags.focus.index \
+    chain + use_index "$tind" + or , compare tags.focus.index != PRE , use_previous 
+#+end_example

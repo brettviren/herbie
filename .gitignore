@@ -9,3 +9,4 @@ log
 old
 cut
 build
+*.egg-info
