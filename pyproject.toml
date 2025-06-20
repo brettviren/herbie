@@ -10,7 +10,8 @@ requires-python = ">=3.11"
 dependencies = [
     "anytree>=2.13.0",
     "click>=8.2.1",
-    "pygobject>=3.52.3",
+    # https://github.com/beeware/toga/issues/3143
+    "pygobject<=3.50",
     "rofi-menu>=0.6",
     "sexpdata>=1.0.2",
 ]
