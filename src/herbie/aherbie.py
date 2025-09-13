@@ -84,6 +84,21 @@ class Herbie:
             # log.debug(f'hooking: [{len(parts)}] {parts}')
             await meth(*parts)
 
+    async def reinit_idle(self, name):
+        autostart = Path(Path.home() / ".config/herbie/autostart")
+        if autostart.exists():
+            log.debug('running herbie autostart')
+            proc = await asyncio.create_subprocess_exec(
+                autostart,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE)
+            stdout, stderr = await proc.communicate()
+            if stdout:
+                log.debug(stdout.decode())
+            if stderr:
+                log.warn(stderr.decode())
+
+
     async def tag_added(self, name, tag):
         time = now()
         await hc(*f'new_attr string tags.by-name.{tag}.my_focus_time {time}'
@@ -118,7 +133,7 @@ class Herbie:
         #os.execv(__file__, sys.argv)
         log.info(f'command: {sys.argv}')
         os.execv(sys.argv[0], sys.argv)
-        log.info("reloaded")
+        log.info("reloaded") # this is never called
 
     task_menu_render = Rofi()
 
