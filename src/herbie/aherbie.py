@@ -81,7 +81,7 @@ class Herbie:
                 # log.debug(f'no hook for {hook}')
                 continue
 
-            # log.debug(f'hooking: [{len(parts)}] {parts}')
+            log.debug(f'hooking: [{len(parts)}] {parts}')
             await meth(*parts)
 
     async def reinit_idle(self, name):
@@ -122,7 +122,9 @@ class Herbie:
         history = await window_times(tag)
         log.debug(f'HISTORY {history}')
         if len(history) > 1:
-            wid = history[1][0]
+            last = history[0]
+            log.debug(f'JUMPTO {last}')
+            wid = last[0]
             await hc("jumpto", wid)
 
     async def reload(self, name):
