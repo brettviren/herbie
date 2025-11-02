@@ -1,0 +1,51 @@
+name: Python Publish to PyPI
+on:
+  release:
+    types: [published] # This workflow runs when a new release is published on GitHub
+
+# Define permissions needed for OpenID Connect (OIDC) authentication
+permissions:
+  id-token: write # Required for PyPI's Trusted Publishers feature
+  contents: read  # Required to checkout the code
+
+jobs:
+  publish:
+    name: Build and Publish Package
+    runs-on: ubuntu-latest
+
+    # This environment name should match the optional environment name you set on PyPI
+    # If you didn't set an environment on PyPI, remove this line.
+    environment: pypi 
+    
+    permissions:
+      id-token: write # MANDATORY for PyPI Trusted Publishers
+      contents: read  # Required to checkout the code
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' 
+          
+      - name: Install build dependencies
+        run: |
+          # The 'build' package handles creating sdist and wheel distributions
+          python -m pip install --upgrade pip build
+
+      - name: Build sdist and wheel packages
+        # This command creates your distribution files in the 'dist/' directory
+        run: python -m build
+
+      - name: Publish package to PyPI (Trusted Publisher)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # with:
+          # The package name and the account
+          # are inferred from the Trusted Publisher configuration you set up on PyPI.
+          # No token is needed, making this secure!
+          # If publishing to TestPyPI first, uncomment the line below:
+          # repository-url: https://test.pypi.org/legacy/
