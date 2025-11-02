@@ -4,7 +4,7 @@
 name = "herbstluft-herbie"
 version = "0.2"
 description = "Add your description here"
-readme = {file = "README.org", content-type = "text/org"}
+readme = "README.md"
 authors = [
     { name = "Brett Viren", email = "brett.viren@gmail.com" }
 ]
