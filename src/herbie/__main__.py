@@ -39,6 +39,14 @@ def cli(ctx, hc, log_file, log_level, config):
     ctx.obj = Herbie(config)
 
 
+@cli.command("version")
+def version():
+    '''
+    Print the version
+    '''
+    import herbie
+    print(herbie.__version__)
+
 @cli.command("hooks")
 @click.pass_context
 def hooks(ctx):

@@ -1,6 +1,8 @@
 [project]
-name = "herbie"
-version = "0.1.1"
+#name = "herbie"
+## The name "herbie" is taken on PyPI so we qualify it.
+name = "herbstluft-herbie"
+version = "0.2"
 description = "Add your description here"
 readme = {file = "README.org", content-type = "text/org"}
 authors = [

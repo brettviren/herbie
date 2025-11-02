@@ -28,17 +28,15 @@ However, you may first need:
 apt install libgirepository1.0-dev
 #+end_example
 
+*herbie* is also on PyPI as *herbstluft-herbie*.
+
 * Usage
 
 The *herbie* package provides a ~herbie~ command line program.  Run it to print a
 brief help message:
 
-#+begin_src shell :exports results :results output code :wrap "example"
-herbie
-#+end_src
-
-#+RESULTS:
 #+begin_example
+$ herbie
 Usage: herbie [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -49,7 +47,8 @@ Options:
   --help                Show this message and exit.
 
 Commands:
-  hooks  Start herbie loop and respond react to herbstlufwm hooks
+  hooks    Start herbie loop and respond react to herbstlufwm hooks
+  version  Print the version
 #+end_example
 
 * Hooks

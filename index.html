@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-05-26 Mon 10:17 -->
+<!-- 2025-11-02 Sun 11:47 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>🌿 herbie 🌿</title>
@@ -210,21 +210,21 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org62ce255">Intro</a></li>
-<li><a href="#org028adfc">Documentation</a></li>
-<li><a href="#org5bf6ba2">Installation</a></li>
-<li><a href="#org352cd52">Usage</a></li>
-<li><a href="#org40d8b6d">Hooks</a></li>
-<li><a href="#orge3a96a4">Layouts</a></li>
-<li><a href="#orgfd7af17">Tasks</a></li>
-<li><a href="#org4456757">See also</a></li>
-<li><a href="#org158cfc1">Todo</a></li>
+<li><a href="#orgf84af6e">Intro</a></li>
+<li><a href="#org85aa347">Documentation</a></li>
+<li><a href="#orgf3e4f4a">Installation</a></li>
+<li><a href="#orgaffcec6">Usage</a></li>
+<li><a href="#org4f67044">Hooks</a></li>
+<li><a href="#orgc9489cc">Layouts</a></li>
+<li><a href="#orgc32b1b7">Tasks</a></li>
+<li><a href="#org8e02b2b">See also</a></li>
+<li><a href="#orgdebd6ae">Todo</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org62ce255" class="outline-2">
-<h2 id="org62ce255">Intro</h2>
-<div class="outline-text-2" id="text-org62ce255">
+<div id="outline-container-orgf84af6e" class="outline-2">
+<h2 id="orgf84af6e">Intro</h2>
+<div class="outline-text-2" id="text-orgf84af6e">
 <p>
 <b>herbie</b> is helper for managing a <a href="https://herbstluftwm.org/">herbstluftwm</a> interactive environment.
 Interactivity is provide through keybindings and <a href="https://github.com/davatorium/rofi">rofi</a> and the
@@ -232,43 +232,48 @@ Interactivity is provide through keybindings and <a href="https://github.com/dav
 </p>
 </div>
 </div>
-<div id="outline-container-org028adfc" class="outline-2">
-<h2 id="org028adfc">Documentation</h2>
-<div class="outline-text-2" id="text-org028adfc">
+<div id="outline-container-org85aa347" class="outline-2">
+<h2 id="org85aa347">Documentation</h2>
+<div class="outline-text-2" id="text-org85aa347">
 <p>
 You are reading it.  This file is it.  You can see it rendered by
 <a href="https://github.com/brettviren/herbie/blob/master/README.org">github</a> or more beautifully by <a href="https://brettviren.github.io/herbie/">Emacs</a> (with the help of <a href="https://github.com/fniessen/org-html-themes">fniessen's ReadTheOrg</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org5bf6ba2" class="outline-2">
-<h2 id="org5bf6ba2">Installation</h2>
-<div class="outline-text-2" id="text-org5bf6ba2">
+<div id="outline-container-orgf3e4f4a" class="outline-2">
+<h2 id="orgf3e4f4a">Installation</h2>
+<div class="outline-text-2" id="text-orgf3e4f4a">
 <p>
 <b>herbie</b> attempts to be a well behaved Python package so install it as such however you normally do.  Recommended:
 </p>
 
-<pre class="example" id="org89508ac">
+<pre class="example" id="orgcd17564">
 uv tool install git+https://github.com/brettviren/herbie
 </pre>
 
 <p>
 However, you may first need:
 </p>
-<pre class="example" id="orge015e3a">
+<pre class="example" id="org07c3ac9">
 apt install libgirepository1.0-dev
 </pre>
+
+<p>
+<b>herbie</b> is also on PyPI as <b>herbstluft-herbie</b>.
+</p>
 </div>
 </div>
-<div id="outline-container-org352cd52" class="outline-2">
-<h2 id="org352cd52">Usage</h2>
-<div class="outline-text-2" id="text-org352cd52">
+<div id="outline-container-orgaffcec6" class="outline-2">
+<h2 id="orgaffcec6">Usage</h2>
+<div class="outline-text-2" id="text-orgaffcec6">
 <p>
 The <b>herbie</b> package provides a <code>herbie</code> command line program.  Run it to print a
 brief help message:
 </p>
 
-<pre class="example" id="orge69042d">
+<pre class="example" id="org8ef19d3">
+$ herbie
 Usage: herbie [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -279,18 +284,19 @@ Options:
   --help                Show this message and exit.
 
 Commands:
-  hooks  Start herbie loop and respond react to herbstlufwm hooks
+  hooks    Start herbie loop and respond react to herbstlufwm hooks
+  version  Print the version
 </pre>
 </div>
 </div>
-<div id="outline-container-org40d8b6d" class="outline-2">
-<h2 id="org40d8b6d">Hooks</h2>
-<div class="outline-text-2" id="text-org40d8b6d">
+<div id="outline-container-org4f67044" class="outline-2">
+<h2 id="org4f67044">Hooks</h2>
+<div class="outline-text-2" id="text-org4f67044">
 <p>
 Once started, <b>herbie</b> is long-running and the primary measns to communicate it is with herbstlufwm "hooks".  <b>herbie</b> will react to standard and custom hooks.  For example,
 </p>
 
-<pre class="example" id="org6a7520a">
+<pre class="example" id="org4bfe868">
 $ herbstclient emit_hook window_jump_tag
 </pre>
 
@@ -320,7 +326,7 @@ binding.  Here is a snippet of <code>~/.config/herbstluftwm/autostart</code> tha
 examples:
 </p>
 
-<pre class="example" id="org98fa0bf">
+<pre class="example" id="org5e866d6">
 # emit to herbie
 hc keybind $Mod-n        emit_hook window_jump_tag
 hc keybind $Mod-Shift-n  emit_hook window_jump_any
@@ -336,14 +342,14 @@ hc keybind $Mod-Shift-i emit_hook task_clear
 </pre>
 </div>
 </div>
-<div id="outline-container-orge3a96a4" class="outline-2">
-<h2 id="orge3a96a4">Layouts</h2>
-<div class="outline-text-2" id="text-orge3a96a4">
+<div id="outline-container-orgc9489cc" class="outline-2">
+<h2 id="orgc9489cc">Layouts</h2>
+<div class="outline-text-2" id="text-orgc9489cc">
 <p>
 A "layout" is a description of how herbstluftwm places windows in a tag.  For example, you may see the layout of your current tag with: 
 </p>
 
-<pre class="example" id="org2cf875d">
+<pre class="example" id="orgd2dd21b">
 $ herbstclient dump
 (split horizontal:0.5:0 (clients grid:0 0x120000e) (clients grid:0 0x3c00142))
 </pre>
@@ -358,7 +364,7 @@ The menu items include the layout name as well as a little icon that <b>herbie</
 
 
 
-<div id="org201dfcb" class="figure">
+<div id="org2c244db" class="figure">
 <p><img src="docs/layouts.png" alt="layouts.png" />
 </p>
 </div>
@@ -368,7 +374,7 @@ The menu items include the layout name as well as a little icon that <b>herbie</
 Layouts are saved in:
 </p>
 
-<pre class="example" id="org3bcdead">
+<pre class="example" id="orgf841288">
 ~/.config/herbie/layouts/&lt;tag&gt;/&lt;name&gt;.layout
 </pre>
 
@@ -376,7 +382,7 @@ Layouts are saved in:
 The user may create or edit these files by hand but perhaps it is easiest to configure a layout via herbstluftwm and then save it.
 </p>
 
-<div class="note" id="org3007c53">
+<div class="note" id="org7e12475">
 <p>
 Layouts from <code>herbstclient dump</code> include a window ID number and these may appear
 in <code>.layout</code> files.  This window ID is ignored by <b>herbie</b>.
@@ -385,14 +391,14 @@ in <code>.layout</code> files.  This window ID is ignored by <b>herbie</b>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgfd7af17" class="outline-2">
-<h2 id="orgfd7af17">Tasks</h2>
-<div class="outline-text-2" id="text-orgfd7af17">
+<div id="outline-container-orgc32b1b7" class="outline-2">
+<h2 id="orgc32b1b7">Tasks</h2>
+<div class="outline-text-2" id="text-orgc32b1b7">
 <p>
 Tasks are like layouts with added support for starting applications.  They are configured through the <b>herbie</b> config file
 </p>
 
-<pre class="example" id="org7bff623">
+<pre class="example" id="orgeace081">
 ~/.config/herbie/herbie.cfg
 </pre>
 
@@ -400,7 +406,7 @@ Tasks are like layouts with added support for starting applications.  They are c
 A task is specified in a form similar to a herbstluftwm layout but the <code>(clients)</code> form supports an additional <code>window:&lt;name&gt;</code> field.  It specifies an application that should exist in the herbstluftwm frame.  This is most clear with an example:
 </p>
 
-<pre class="example" id="org70bdd5f">
+<pre class="example" id="org7de08cd">
 [window firefox-rss]
 title = Mozilla Firefox
 command = firefox -P rss-profile
@@ -422,7 +428,7 @@ rss = (split horizontal:0.75:1
 Each <code>[window &lt;name&gt;]</code> gives a <code>command</code> to run to populate the frame while the <code>class</code> or <code>title</code> gives string that is used to match these client attributes as may be found with, for example:
 </p>
 
-<pre class="example" id="org6b9ec79">
+<pre class="example" id="org438a099">
 herbstclient attr clients.&lt;window-id&gt;.{title,class}
 </pre>
 
@@ -432,15 +438,15 @@ The result is an automatically and repeatably populated tag.
 </p>
 
 
-<div id="orgef5be86" class="figure">
+<div id="org7648921" class="figure">
 <p><a href="docs/ss.png"><img src="docs/ss-thumb.png" alt="ss-thumb.png" /></a>
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org4456757" class="outline-2">
-<h2 id="org4456757">See also</h2>
-<div class="outline-text-2" id="text-org4456757">
+<div id="outline-container-org8e02b2b" class="outline-2">
+<h2 id="org8e02b2b">See also</h2>
+<div class="outline-text-2" id="text-org8e02b2b">
 <ul class="org-ul">
 <li><a href="https://herbstluftwm.org/">https://herbstluftwm.org/</a> of course.</li>
 
@@ -448,9 +454,9 @@ The result is an automatically and repeatably populated tag.
 </ul>
 </div>
 </div>
-<div id="outline-container-org158cfc1" class="outline-2">
-<h2 id="org158cfc1">Todo</h2>
-<div class="outline-text-2" id="text-org158cfc1">
+<div id="outline-container-orgdebd6ae" class="outline-2">
+<h2 id="orgdebd6ae">Todo</h2>
+<div class="outline-text-2" id="text-orgdebd6ae">
 <ul class="org-ul">
 <li class="off"><code>[&#xa0;]</code> Layouts should be definable in <code>herbie.cfg</code> and that set should be a union
 of what is manged in <code>layouts/</code>.</li>
@@ -471,7 +477,7 @@ integrated or purged.</li>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Brett Viren</p>
-<p class="date">Created: 2025-05-26 Mon 10:17</p>
+<p class="date">Created: 2025-11-02 Sun 11:47</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
