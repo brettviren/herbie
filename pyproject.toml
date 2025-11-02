@@ -1,10 +1,19 @@
+# To publish a release
+# uv version X.Y
+# uv build
+# uv publish --token (pass org/python/pypi/herbie|head -1)
+
+
 [project]
 #name = "herbie"
 ## The name "herbie" is taken on PyPI so we qualify it.
 name = "herbstluft-herbie"
-version = "0.2"
+version = "0.3"
 description = "Add your description here"
-readme = "README.md"
+# I don't want a markdown README, but apparently PyPI requires it.  I export
+# README.org to index.<ext> anyways to get index.html for the github pages.  So,
+# do "C-c C-e g g" and "C-c C-e h h" before tagging a release.
+readme = "index.md"
 authors = [
     { name = "Brett Viren", email = "brett.viren@gmail.com" }
 ]

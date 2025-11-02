@@ -1,5 +1,6 @@
 #+title: 🌿 herbie 🌿
 #+subtitle: A herbstluftwm interactive environment thingy.
+#+export_file_name: index
 #+OPTIONS:   H:4 num:nil toc:2
 #+setupfile: docs/theme-readtheorg-local.setup
 
