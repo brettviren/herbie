@@ -10,7 +10,7 @@ log = logging.getLogger("herbie")
 
 
 def now():
-    return str(datetime.now().timestamp())
+    return datetime.now().timestamp()
 
 
 herbstclient = "herbstclient"
@@ -23,7 +23,6 @@ async def hc(*args):
     if len(args) == 1 and isinstance(args[0],str):
         args = args[0].split(" ")
 
-    argstr = ' '.join(args)
     proc = await asyncio.create_subprocess_exec(
         herbstclient, *args,
         stdout=asyncio.subprocess.PIPE,
@@ -130,7 +129,7 @@ async def window_times(want_tag=None):
          'substitute', 'WINID', 'W',
          'echo', 'WINID', 'TAG', 'FOCUS']
     got = await hc(*cmd)
-    ret = list()
+    by_id = dict()
     for one in got.split("\n"):
         one = one.strip()
         if not one:
@@ -138,8 +137,8 @@ async def window_times(want_tag=None):
         wid, tag, time = one.split()
         if want_tag and tag != want_tag:
             continue
-        ret.append((wid, tag, float(time)))
-    return sorted(ret, key=lambda tt: tt[2])
+        by_id[wid] = (wid, tag, float(time))
+    return sorted(by_id.values(), key=lambda tt: tt[2])
 
 
 async def window_ids(want_tag=None):
@@ -218,7 +217,7 @@ async def init_my_focus_time():
         if not parts:
             continue
         tag = parts[-1]
-        time = now()
+        time = str(now())
         attr = f'tags.by-name.{tag}.my_focus_time'
         cmd = ['or', ',',
                'get_attr', attr, ',',
@@ -233,7 +232,7 @@ async def init_my_focus_time():
         wid = parts[1].strip()
         if not wid.startswith('0x'):
             continue
-        time = now()
+        time = str(now())
         attr = f'clients.{wid}.my_focus_time'
         cmd = ['or',',',
                'get_attr', attr, ',',

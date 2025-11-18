@@ -114,18 +114,50 @@ class Herbie:
         time = now()
         await hc(*f'set_attr clients.{wid}.my_focus_time {time}'.split())
 
+    # The time last_window was last called.
+    _last_window_time = None
+    _last_window_index = 1
+    last_window_timeout = 1.0   # seconds
+
+    async def last_window_index(self):
+        '''
+        Allow to go back in history via last_window if fast enough
+        '''
+        
+        # normal "slow" running we always want "second freshest" in history.
+        if self._last_window_time is None or self._last_window_time < now() - self.last_window_timeout:
+            self._last_window_time = now()
+            self._last_window_index = 1
+            return self._last_window_index
+
+        # if "fast" running, we want "the next least fresh" in history
+        self._last_window_index += 1
+
+        # cycle around if we exceed history size
+        nclients = int(await hc('get_attr tags.focus.client_count'))
+        if self._last_window_index >= nclients:
+            self._last_window_index = 0
+        self._last_window_time = now()
+        return self._last_window_index
+    
     async def last_window(self, name):
         '''
         Focus the previously focused window.
         '''
         tag = await focused_tag()
         history = await window_times(tag)
+        # make freshest first
+        history.reverse()
         log.debug(f'HISTORY {history}')
-        if len(history) > 1:
-            last = history[0]
-            log.debug(f'JUMPTO {last}')
-            wid = last[0]
-            await hc("jumpto", wid)
+        if len(history) <= 1:
+            return
+
+        # history item is: (wid,tag,time)
+        index = await self.last_window_index()
+        last = history[index]
+        log.debug(f'JUMPTO {last}')
+        wid = last[0]
+        await hc("jumpto", wid)
 
     async def reload(self, name):
         '''
