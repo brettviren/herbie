@@ -110,8 +110,10 @@ class Herbie:
 
     async def focus_changed(self, name, wid, title=None):
         if wid == '0x0':
+            log.debug(f'focus_changed got wid-0x0: {name} {title}')
             return
         time = now()
+        log.debug(f'focus_changed set {wid=} ({name} {title}) to {time}')
         await hc(*f'set_attr clients.{wid}.my_focus_time {time}'.split())
 
     # The time last_window was last called.
@@ -154,8 +156,10 @@ class Herbie:
 
         # history item is: (wid,tag,time)
         index = await self.last_window_index()
+        if index >= len(history):
+            index = 0
         last = history[index]
-        log.debug(f'JUMPTO {last}')
+        log.debug(f'JUMPTO {index=} {last}')
         wid = last[0]
         await hc("jumpto", wid)
 
