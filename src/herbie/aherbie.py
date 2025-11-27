@@ -7,6 +7,7 @@ from anytree.resolver import Resolver, ChildResolverError
 from herbie.util import make_tree, render_split
 from herbie.hmenu import Menu, Item, Rofi 
 import herbie.alayouts as layouts
+import datetime
 
 import logging
 log = logging.getLogger("herbie")
@@ -49,6 +50,8 @@ class Herbie:
         self.cfgfile = cfgfile
         self.cfg = get_config(cfgfile)
         self.wincfg = dict()
+        self.start_time = now()
+        log.info(f'herbie starting at {datetime.datetime.fromtimestamp(self.start_time)}')
         for sec in self.cfg:
             if not sec.startswith("window "):
                 continue
@@ -114,7 +117,10 @@ class Herbie:
             return
         time = now()
         log.debug(f'focus_changed set {wid=} ({name} {title}) to {time}')
-        await hc(*f'set_attr clients.{wid}.my_focus_time {time}'.split())
+        attr = f'clients.{wid}.my_focus_time'
+        cmd = f'or , set_attr {attr} {time} , new_attr string {attr} {time}'
+        # log.debug(f'focus_changed: {cmd}')
+        await hc(*cmd.split())
 
     # The time last_window was last called.
     _last_window_time = None
@@ -150,7 +156,11 @@ class Herbie:
         history = await window_times(tag)
         # make freshest first
         history.reverse()
-        log.debug(f'HISTORY {history}')
+        for number, (wid,tag,time) in enumerate(history):
+            title = await hc(f'get_attr clients.{wid}.title')
+            ts = datetime.datetime.fromtimestamp(time)
+            log.debug(f'HISTORY:{number} {tag} {wid} {ts} ({time-self.start_time:.1f}) {title.strip()}')
+
         if len(history) <= 1:
             return
 
