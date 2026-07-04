@@ -10,3 +10,7 @@ old
 cut
 build
 *.egg-info
+docs/bigblow_theme
+docs/css
+docs/darksun
+docs/theme-*

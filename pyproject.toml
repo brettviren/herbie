@@ -9,7 +9,7 @@
 ## The name "herbie" is taken on PyPI so we qualify it.
 name = "herbstluft-herbie"
 version = "0.3"
-description = "Add your description here"
+description = "A herbstluftwm interactive environment thingy"
 # I don't want a markdown README, but apparently PyPI requires it.  I export
 # README.org to index.<ext> anyways to get index.html for the github pages.  So,
 # do "C-c C-e g g" and "C-c C-e h h" before tagging a release.
