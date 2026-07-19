@@ -6,54 +6,42 @@
 
 * Intro
 
-*herbie* is helper for managing a [[https://herbstluftwm.org/][herbstluftwm]] interactive environment.
-Interactivity is provide through keybindings and [[https://github.com/davatorium/rofi][rofi]] and the
-[[https://github.com/miphreal/python-rofi-menu][rofi-menu]] Python interface.
+*herbie* is persistent helper for adding behavior to [[https://herbstluftwm.org/][herbstluftwm]] by reacting to keybindings and interacting via [[https://github.com/davatorium/rofi][rofi]].
 
 * Documentation
 
-You are reading it.  This file is it.  You can see it rendered by
-[[https://github.com/brettviren/herbie/blob/master/README.org][github]] or more beautifully by [[https://brettviren.github.io/herbie/][Emacs]] (with the help of [[https://github.com/fniessen/org-html-themes][fniessen's ReadTheOrg]])
+You are reading it.  This file is it.  You can see it rendered in the [[https://github.com/brettviren/herbie/blob/master/README.org][herbie's
+github repo]] or more beautifully by Emacs with the help of [[https://github.com/fniessen/org-html-themes][fniessen's ReadTheOrg]]
+on [[https://brettviren.github.io/herbie/][herbie's github pages]].
 
 * Installation
 
-*herbie* attempts to be a well behaved Python package so install it as such however you normally do.  Recommended:
+*herbie* installs in the usual Python ways.  Direct from GitHub:
 
 #+begin_example
 uv tool install git+https://github.com/brettviren/herbie
 #+end_example
 
-However, you may first need:
+Or from PyPi
+
 #+begin_example
-apt install libgirepository1.0-dev
+uv tool install herbstluft-herbie
 #+end_example
 
-*herbie* is also on PyPI as *herbstluft-herbie*.
+Note, the project named [[https://pypi.org/project/herbie/][herbie on PyPI]] is not related to this herbie.
 
 * Usage
 
-The *herbie* package provides a ~herbie~ command line program.  Run it to print a
-brief help message:
-
 #+begin_example
-$ herbie
-Usage: herbie [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  -h, --hc TEXT         Set the herbstclient executable name
-  -c, --config PATH     Set configuration file
-  -l, --log-file TEXT   Set log file, default is terminal
-  -L, --log-level TEXT  Set log level
-  --help                Show this message and exit.
-
-Commands:
-  hooks    Start herbie loop and respond react to herbstlufwm hooks
-  version  Print the version
+$ herbie hooks
 #+end_example
+
+Run with no arguments to get help on log and config files and if herbie needs
+help to find =herbstclient=.
 
 * Hooks
 
-Once started, *herbie* is long-running and the primary measns to communicate it is with herbstlufwm "hooks".  *herbie* will react to standard and custom hooks.  For example,
+Once started, *herbie* is long-running process that *reacts* to information from *herbstluftwm* "hooks".  *herbie* can react to standard hooks and custom hooks.  For example,
 
 #+begin_example
 $ herbstclient emit_hook window_jump_tag
@@ -106,7 +94,7 @@ $ herbstclient dump
 
 *herbie* has support for managing a persistent store of layouts and applying them.  It does this by presenting the user with a rofi menu in response to the ~layout_{drop,save,load}~ hooks.
 
-The menu items include the layout name as well as a little icon that *herbie* generates to show the window outlines in the layout.  Here is an example:
+The menu items include the layout name as well as a little icon that *herbie* generates to show the geometry of the window outlines.  Here is an example:
 
 
 [[file:docs/layouts.png]]
@@ -127,7 +115,7 @@ in ~.layout~ files.  This window ID is ignored by *herbie*.
 
 * Tasks
 
-Tasks are like layouts with added support for starting applications.  They are configured through the *herbie* config file
+Tasks are like layouts with added support for starting applications.  The term "task" refers to setting up a space for a user, and not herbie, to perform tasks.  Tasks are configured through the *herbie* config file
 
 #+begin_example
 ~/.config/herbie/herbie.cfg
@@ -179,11 +167,7 @@ The result is an automatically and repeatably populated tag.
 - [ ] The task layout should be considered without needing to be redefined
   explicitly as a layout.
 
-- [ ] The OG *herbie* kept a custom ~my_focused_time~ window attribute so that it
-  can implement a "switch to last used window" operation.  This has become
-  broken in the new async version.
-
-- [ ] *herbie* modules starting with "a" for "async" are largely current.  The
-  rest is mostly cruft remaining from the old, non-async version.  It should be
-  integrated or purged.
-
+- [ ] herbsluftwm 0.9.6 adds a =--binary-pipe= which allows to send multiple
+  commands through a single herbstclient instance.  A few of herbie's reactions
+  invoke a sequence of herbstclient calls and they may benefit from this
+  feature.

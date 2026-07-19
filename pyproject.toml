@@ -1,7 +1,11 @@
+# To develop
+# $ git config core.hooksPath .githooks 
+
 # To publish a release
-# uv version X.Y
-# uv build
-# uv publish --token (pass org/python/pypi/herbie|head -1)
+# $ git commit ...
+# $ uv version X.Y
+# $ uv build
+# $ uv publish --token (pass org/python/pypi/herbie|head -1)
 
 
 [project]

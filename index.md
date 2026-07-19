@@ -1,76 +1,64 @@
-- [Intro](#org5840e35)
-- [Documentation](#org33f8399)
-- [Installation](#org21720c9)
-- [Usage](#orgb14f1ce)
-- [Hooks](#orge6a76e0)
-- [Layouts](#orge66c3f5)
-- [Tasks](#org6f6c533)
-- [See also](#org75ee1f3)
-- [Todo](#orgb787aab)
+- [Intro](#org2c68601)
+- [Documentation](#orgc8815f1)
+- [Installation](#org1210550)
+- [Usage](#orgdcdee7a)
+- [Hooks](#org37d10e0)
+- [Layouts](#org041aba3)
+- [Tasks](#orgee4ecf4)
+- [See also](#org30f86e6)
+- [Todo](#orgee29a60)
 
 
 
-<a id="org5840e35"></a>
+<a id="org2c68601"></a>
 
 # Intro
 
-**herbie** is helper for managing a [herbstluftwm](https://herbstluftwm.org/) interactive environment. Interactivity is provide through keybindings and [rofi](https://github.com/davatorium/rofi) and the [rofi-menu](https://github.com/miphreal/python-rofi-menu) Python interface.
+**herbie** is persistent helper for adding behavior to [herbstluftwm](https://herbstluftwm.org/) by reacting to keybindings and interacting via [rofi](https://github.com/davatorium/rofi).
 
 
-<a id="org33f8399"></a>
+<a id="orgc8815f1"></a>
 
 # Documentation
 
-You are reading it. This file is it. You can see it rendered by [github](https://github.com/brettviren/herbie/blob/master/README.org) or more beautifully by [Emacs](https://brettviren.github.io/herbie/) (with the help of [fniessen's ReadTheOrg](https://github.com/fniessen/org-html-themes))
+You are reading it. This file is it. You can see it rendered in the [herbie's github repo](https://github.com/brettviren/herbie/blob/master/README.org) or more beautifully by Emacs with the help of [fniessen's ReadTheOrg](https://github.com/fniessen/org-html-themes) on [herbie's github pages](https://brettviren.github.io/herbie/).
 
 
-<a id="org21720c9"></a>
+<a id="org1210550"></a>
 
 # Installation
 
-**herbie** attempts to be a well behaved Python package so install it as such however you normally do. Recommended:
+**herbie** installs in the usual Python ways. Direct from GitHub:
 
 ```
 uv tool install git+https://github.com/brettviren/herbie
 ```
 
-However, you may first need:
+Or from PyPi
 
 ```
-apt install libgirepository1.0-dev
+uv tool install herbstluft-herbie
 ```
 
-**herbie** is also on PyPI as **herbstluft-herbie**.
+Note, the project named [herbie on PyPI](https://pypi.org/project/herbie/) is not related to this herbie.
 
 
-<a id="orgb14f1ce"></a>
+<a id="orgdcdee7a"></a>
 
 # Usage
 
-The **herbie** package provides a `herbie` command line program. Run it to print a brief help message:
-
 ```
-$ herbie
-Usage: herbie [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  -h, --hc TEXT         Set the herbstclient executable name
-  -c, --config PATH     Set configuration file
-  -l, --log-file TEXT   Set log file, default is terminal
-  -L, --log-level TEXT  Set log level
-  --help                Show this message and exit.
-
-Commands:
-  hooks    Start herbie loop and respond react to herbstlufwm hooks
-  version  Print the version
+$ herbie hooks
 ```
 
+Run with no arguments to get help on log and config files and if herbie needs help to find `herbstclient`.
 
-<a id="orge6a76e0"></a>
+
+<a id="org37d10e0"></a>
 
 # Hooks
 
-Once started, **herbie** is long-running and the primary measns to communicate it is with herbstlufwm "hooks". **herbie** will react to standard and custom hooks. For example,
+Once started, **herbie** is long-running process that **reacts** to information from **herbstluftwm** "hooks". **herbie** can react to standard hooks and custom hooks. For example,
 
 ```
 $ herbstclient emit_hook window_jump_tag
@@ -106,7 +94,7 @@ hc keybind $Mod-Shift-i emit_hook task_clear
 ```
 
 
-<a id="orge66c3f5"></a>
+<a id="org041aba3"></a>
 
 # Layouts
 
@@ -119,7 +107,7 @@ $ herbstclient dump
 
 **herbie** has support for managing a persistent store of layouts and applying them. It does this by presenting the user with a rofi menu in response to the `layout_{drop,save,load}` hooks.
 
-The menu items include the layout name as well as a little icon that **herbie** generates to show the window outlines in the layout. Here is an example:
+The menu items include the layout name as well as a little icon that **herbie** generates to show the geometry of the window outlines. Here is an example:
 
 ![img](docs/layouts.png)
 
@@ -131,7 +119,7 @@ Layouts are saved in:
 
 The user may create or edit these files by hand but perhaps it is easiest to configure a layout via herbstluftwm and then save it.
 
-<div class="note" id="org3cd3d6e">
+<div class="note" id="org10f1411">
 <p>
 Layouts from <code>herbstclient dump</code> include a window ID number and these may appear
 in <code>.layout</code> files.  This window ID is ignored by <b>herbie</b>.
@@ -140,11 +128,11 @@ in <code>.layout</code> files.  This window ID is ignored by <b>herbie</b>.
 </div>
 
 
-<a id="org6f6c533"></a>
+<a id="orgee4ecf4"></a>
 
 # Tasks
 
-Tasks are like layouts with added support for starting applications. They are configured through the **herbie** config file
+Tasks are like layouts with added support for starting applications. The term "task" refers to setting up a space for a user, and not herbie, to perform tasks. Tasks are configured through the **herbie** config file
 
 ```
 ~/.config/herbie/herbie.cfg
@@ -181,7 +169,7 @@ When `task_start` hook is received, **herbie** will present a rofi menu with all
 [![img](docs/ss-thumb.png)](docs/ss.png)
 
 
-<a id="org75ee1f3"></a>
+<a id="org30f86e6"></a>
 
 # See also
 
@@ -190,7 +178,7 @@ When `task_start` hook is received, **herbie** will present a rofi menu with all
 -   A random collection of [tips and tricks](docs/tips.md) to use herbsluftwm.
 
 
-<a id="orgb787aab"></a>
+<a id="orgee29a60"></a>
 
 # Todo
 
@@ -198,6 +186,4 @@ When `task_start` hook is received, **herbie** will present a rofi menu with all
 
 -   [ ] The task layout should be considered without needing to be redefined explicitly as a layout.
 
--   [ ] The OG **herbie** kept a custom `my_focused_time` window attribute so that it can implement a "switch to last used window" operation. This has become broken in the new async version.
-
--   [ ] **herbie** modules starting with "a" for "async" are largely current. The rest is mostly cruft remaining from the old, non-async version. It should be integrated or purged.
+-   [ ] herbsluftwm 0.9.6 adds a `--binary-pipe` which allows to send multiple commands through a single herbstclient instance. A few of herbie's reactions invoke a sequence of herbstclient calls and they may benefit from this feature.

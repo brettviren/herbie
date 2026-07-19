@@ -1,0 +1,31 @@
+#!/bin/sh
+# Reinstall this package's CLI tools after a pull updates the working tree.
+#
+# Shared by the post-merge and post-rewrite hooks.  It is enabled per-clone by
+# pointing core.hooksPath at this directory; see scripts/install-hooks.
+
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Brett Viren <brett.viren@gmail.com>
+
+root=$(git rev-parse --show-toplevel) || exit 0
+cd "$root" || exit 0
+
+# Only reinstall when something that affects the installed tools changed.
+# ORIG_HEAD is the pre-pull HEAD after both a merge and a rebase pull; if it is
+# unavailable (e.g. first pull into a fresh clone) fall through and reinstall.
+if git rev-parse --verify -q ORIG_HEAD >/dev/null; then
+    changed=$(git diff --name-only ORIG_HEAD HEAD -- pyproject.toml uv.lock src/)
+    [ -n "$changed" ] || exit 0
+fi
+
+# Hooks inherit a minimal environment (especially under `clones sync`, which
+# pulls over a non-interactive ssh shell), so uv may not be on PATH; try a
+# common location before giving up.
+command -v uv >/dev/null 2>&1 || PATH="$HOME/.local/bin:$PATH"
+command -v uv >/dev/null 2>&1 || {
+    echo "githook: uv not found on PATH, skipping tool reinstall" >&2
+    exit 0
+}
+
+echo "githook: reinstalling tools (uv tool install -e . --upgrade --force)"
+uv tool install -e . --upgrade --force

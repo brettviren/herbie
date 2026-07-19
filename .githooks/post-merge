@@ -1,0 +1,6 @@
+#!/bin/sh
+# Runs after `git pull` completes as a merge or fast-forward — including the
+# fast-forward case of `git pull --rebase` (which clones sync uses).  See
+# .githooks/_install for the actual work.
+
+exec "$(dirname "$0")/_install"

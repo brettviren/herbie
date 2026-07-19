@@ -1,0 +1,7 @@
+#!/bin/sh
+# Runs after history is rewritten.  $1 is "rebase" or "amend"; react only to
+# rebases (e.g. `git pull --rebase` replaying local commits, which post-merge
+# does NOT cover), never to a plain `git commit --amend`.  See .githooks/_install.
+
+[ "$1" = "rebase" ] || exit 0
+exec "$(dirname "$0")/_install"
