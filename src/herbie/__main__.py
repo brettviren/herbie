@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-'''A companion to herbstluftwm.
+'''
+A companion to herbstluftwm.
 '''
 import click
 import asyncio

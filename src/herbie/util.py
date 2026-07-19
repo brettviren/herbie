@@ -1,8 +1,6 @@
-import sys
 import time
 import sexpdata
 from anytree import Node
-from anytree.resolver import Resolver, ChildResolverError
 from importlib import import_module
 
 

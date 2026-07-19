@@ -8,7 +8,7 @@
 #name = "herbie"
 ## The name "herbie" is taken on PyPI so we qualify it.
 name = "herbstluft-herbie"
-version = "0.3"
+version = "0.4"
 description = "A herbstluftwm interactive environment thingy"
 # I don't want a markdown README, but apparently PyPI requires it.  I export
 # README.org to index.<ext> anyways to get index.html for the github pages.  So,
@@ -21,9 +21,6 @@ requires-python = ">=3.11"
 dependencies = [
     "anytree>=2.13.0",
     "click>=8.2.1",
-    # https://github.com/beeware/toga/issues/3143
-    "pygobject<=3.50",
-    "rofi-menu>=0.6",
     "sexpdata>=1.0.2",
 ]
 

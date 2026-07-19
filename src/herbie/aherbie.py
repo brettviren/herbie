@@ -9,13 +9,13 @@ from herbie.hmenu import Menu, Item, Rofi
 import herbie.alayouts as layouts
 import datetime
 
-import logging
-log = logging.getLogger("herbie")
-
 from herbie.astluft import (
     hc, now, get_layout, tag_status, window_info,
     window_times, window_ids, tag_times, focused_tag,
     init_my_focus_time, clear_tag)
+
+import logging
+log = logging.getLogger("herbie")
 
 def get_config(cfgfile=None):
     cfg = configparser.ConfigParser()
