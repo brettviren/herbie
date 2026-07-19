@@ -5,6 +5,9 @@
 # $ git commit ...
 # $ uv version X.Y
 # $ uv build
+
+# Note, making a release on GitHub should trigger a publish to PyPI.
+# Here's the manual method:
 # $ uv publish --token (pass org/python/pypi/herbie|head -1)
 
 
